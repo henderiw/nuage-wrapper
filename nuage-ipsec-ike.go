@@ -186,11 +186,9 @@ func NuageCreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, p
 	return ikeGatewayProfile
 }
 
-// NuageIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
-func NuageIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.IKEGatewayConnection {
-	fmt.Println("########################################")
-	fmt.Println("#####  IKE GW Connection      ##########")
-	fmt.Println("########################################")
+// NuageCreateIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
+func NuageCreateIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.IKEGatewayConnection {
+	log.Println("NuageCreateIKEGatewayConnection started")
 
 	ikeGatewayConns, err := parent.IKEGatewayConnections(&bambou.FetchingInfo{
 		Filter: ikeGatewayConnCfg["Name"].(string)})
@@ -221,9 +219,29 @@ func NuageIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent 
 		fmt.Println("IKE GW Connection created")
 	}
 
-	fmt.Printf("%#v \n", ikeGatewayConn)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Printf("%#v \n", ikeGatewayConn)
+	log.Println("NuageCreateIKEGatewayConnection finished")
 	return ikeGatewayConn
+}
+
+// NuageDeleteIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
+func NuageDeleteIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) error {
+	log.Println("NuageDeleteIKEGatewayConnection started")
+
+	ikeGatewayConns, err := parent.IKEGatewayConnections(&bambou.FetchingInfo{
+		Filter: ikeGatewayConnCfg["Name"].(string)})
+	handleError(err, "READ", "IKE GW Connection")
+
+	// init the nsPort struct that will hold either the received object
+	// or will be created from the nsPortCfg
+	ikeGatewayConn := &vspk.IKEGatewayConnection{}
+
+	if ikeGatewayConns != nil {
+		fmt.Println("IKE GW Connection already exists")
+		ikeGatewayConn = ikeGatewayConns[0]
+		ikeGatewayConn.Delete()
+	}
+	log.Printf("%#v \n", ikeGatewayConn)
+	log.Println("NuageIKEGatewayConnection finished")
+	return nil
 }
