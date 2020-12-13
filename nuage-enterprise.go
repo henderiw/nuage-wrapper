@@ -44,3 +44,39 @@ func NuageEnterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vsp
 	}
 	return enterprise
 }
+
+// NuageEnterpriseprofile is a wrapper to create nuage enterprise profile in a declaritive way
+func NuageEnterpriseprofile(enterpriseProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.EnterpriseProfile {
+	enterpriseProfile := &vspk.EnterpriseProfile{}
+
+	enterpriseProfiles, err := parent.EnterpriseProfiles(&bambou.FetchingInfo{
+		Filter: enterpriseProfileCfg["Name"].(string)})
+	handleError(err, "enterpriseProfile", "READ")
+
+	fmt.Println("################" + enterpriseProfileCfg["Name"].(string) + "###############")
+	fmt.Println(enterpriseProfiles)
+
+	// init the enterprise struct that will hold either the received object
+	// or will be created from the enterpriseProfileCfg
+	if enterpriseProfiles != nil {
+		fmt.Println("enterpriseProfile already exists")
+
+		enterpriseProfile = enterpriseProfiles[0]
+		errMergo := mergo.Map(enterpriseProfile, enterpriseProfileCfg, mergo.WithOverride)
+		if errMergo != nil {
+			log.Fatal(errMergo)
+		}
+		enterpriseProfile.Save()
+
+	} else {
+		errMergo := mergo.Map(enterpriseProfile, enterpriseProfileCfg, mergo.WithOverride)
+		if errMergo != nil {
+			log.Fatal(errMergo)
+		}
+		err := parent.CreateEnterpriseProfile(enterpriseProfile)
+		handleError(err, "enterpriseProfile", "CREATE")
+
+		fmt.Println("enterpriseProfile created")
+	}
+	return enterpriseProfile
+}

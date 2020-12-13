@@ -302,3 +302,87 @@ func NuageUnderlay(underlayCfg map[string]interface{}, parent *vspk.Me) *vspk.Un
 	fmt.Println("****************************************")
 	return underlay
 }
+
+// NuageInfraNsgGroup is a wrapper to create nuage NSG Group in a declaritive way
+func NuageInfraNsgGroup(nsgGroupCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGGroup {
+	fmt.Println("########################################")
+	fmt.Println("#####     NSG Group            #########")
+	fmt.Println("########################################")
+
+	nsgGroup := &vspk.NSGGroup{}
+
+	nsgGroups, err := parent.NSGGroups(&bambou.FetchingInfo{
+		Filter: nsgGroupCfg["Name"].(string)})
+	handleError(err, "NSG group", "READ")
+
+	// init the struct that will hold either the received object
+	// or will be created from the Cfg object
+	if nsgGroups != nil {
+		fmt.Println("NSG group already exists")
+
+		nsgGroup = nsgGroups[0]
+		errMergo := mergo.Map(nsgGroup, nsgGroupCfg, mergo.WithOverride)
+		if errMergo != nil {
+			log.Fatal(errMergo)
+		}
+		nsgGroup.Save()
+
+	} else {
+
+		errMergo := mergo.Map(nsgGroup, nsgGroupCfg, mergo.WithOverride)
+		if errMergo != nil {
+			log.Fatal(errMergo)
+		}
+		err := parent.CreateNSGGroup(nsgGroup)
+		handleError(err, "NSG Group", "CREATE")
+
+		fmt.Println("NSG Group created")
+	}
+	fmt.Printf("%#v \n", nsgGroup)
+	fmt.Println("****************************************")
+	fmt.Println("****************************************")
+	fmt.Println("****************************************")
+	return nsgGroup
+}
+
+// NuageNsgGroup is a wrapper to create nuage NSG Group in a declaritive way
+func NuageNsgGroup(nsgGroupCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSGGroup {
+	fmt.Println("########################################")
+	fmt.Println("#####     NSG Group            #########")
+	fmt.Println("########################################")
+
+	nsgGroup := &vspk.NSGGroup{}
+
+	nsgGroups, err := parent.NSGGroups(&bambou.FetchingInfo{
+		Filter: nsgGroupCfg["Name"].(string)})
+	handleError(err, "NSG group", "READ")
+
+	// init the struct that will hold either the received object
+	// or will be created from the Cfg object
+	if nsgGroups != nil {
+		fmt.Println("NSG group already exists")
+
+		nsgGroup = nsgGroups[0]
+		errMergo := mergo.Map(nsgGroup, nsgGroupCfg, mergo.WithOverride)
+		if errMergo != nil {
+			log.Fatal(errMergo)
+		}
+		nsgGroup.Save()
+
+	} else {
+
+		errMergo := mergo.Map(nsgGroup, nsgGroupCfg, mergo.WithOverride)
+		if errMergo != nil {
+			log.Fatal(errMergo)
+		}
+		err := parent.CreateNSGGroup(nsgGroup)
+		handleError(err, "NSG Group", "CREATE")
+
+		fmt.Println("NSG Group created")
+	}
+	fmt.Printf("%#v \n", nsgGroup)
+	fmt.Println("****************************************")
+	fmt.Println("****************************************")
+	fmt.Println("****************************************")
+	return nsgGroup
+}
