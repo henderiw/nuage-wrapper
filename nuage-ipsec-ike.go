@@ -1,20 +1,15 @@
 package nuagewrapper
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
 	"github.com/nuagenetworks/vspk-go/vspk"
+	log "github.com/sirupsen/logrus"
 )
 
 // NuageCreateIKEPSK is a wrapper to create a IKE PSK in a declaritive way
 func NuageCreateIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEPSK {
 	//create PSK
-	fmt.Println("########################################")
-	fmt.Println("#####     IKE PSK          #############")
-	fmt.Println("########################################")
 
 	ikePSK := &vspk.IKEPSK{}
 
@@ -25,7 +20,7 @@ func NuageCreateIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise
 	// init the ikePSK struct that will hold either the received object
 	// or will be created from the ikePSKCfg
 	if ikePSKs != nil {
-		fmt.Println("IKE PSK already exists")
+		log.Infof("IKE PSK already exists")
 
 		ikePSK = ikePSKs[0]
 		errMergo := mergo.Map(ikePSK, ikePSKCfg, mergo.WithOverride)
@@ -44,21 +39,14 @@ func NuageCreateIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise
 		ikePSKErr := parent.CreateIKEPSK(ikePSK)
 		handleError(ikePSKErr, "IKE PSK", "CREATE")
 
-		fmt.Println("IKE PSK created")
+		log.Infof("IKE PSK created")
 	}
-	fmt.Printf("%#v \n", ikePSK)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", ikePSK)
 	return ikePSK
 }
 
 // NuageCreateIKEGateway is a wrapper to create a IKE GW in a declaritive way
 func NuageCreateIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEGateway {
-	fmt.Println("########################################")
-	fmt.Println("#####     IKE Gateway      #############")
-	fmt.Println("########################################")
-
 	ikeGateways, err := parent.IKEGateways(&bambou.FetchingInfo{
 		Filter: ikeGatewayCfg["Name"].(string)})
 	handleError(err, "READ", "IKE Gateway")
@@ -68,7 +56,7 @@ func NuageCreateIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.En
 	ikeGateway := &vspk.IKEGateway{}
 
 	if ikeGateways != nil {
-		fmt.Println("IKE Gateway already exists")
+		log.Infof("IKE Gateway already exists")
 
 		ikeGateway = ikeGateways[0]
 		errMergo := mergo.Map(ikeGateway, ikeGatewayCfg, mergo.WithOverride)
@@ -86,27 +74,20 @@ func NuageCreateIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.En
 		ikeGatewayErr := parent.CreateIKEGateway(ikeGateway)
 		handleError(ikeGatewayErr, "CREATE", "IKE Gateway")
 
-		fmt.Println("IKE Gateway created")
+		log.Infof("IKE Gateway created")
 
 		ikeSubnet := &vspk.IKESubnet{}
 		ikeSubnet.Prefix = "0.0.0.0/0"
 		ikeSubnetErr := ikeGateway.CreateIKESubnet(ikeSubnet)
 		handleError(ikeSubnetErr, "CREATE", "IKE Subnet")
-		fmt.Printf("IKE Subnet created: %s\n", ikeSubnet)
+		log.Infof("IKE Subnet created: %s\n", ikeSubnet)
 	}
-	fmt.Printf("%#v \n", ikeGateway)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", ikeGateway)
 	return ikeGateway
 }
 
 // NuageCreateIKEEncryptionProfile is a wrapper to create a IKE Encryption Profile in a declaritive way
 func NuageCreateIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEEncryptionprofile {
-	fmt.Println("########################################")
-	fmt.Println("#####IKE Encryption Profile#############")
-	fmt.Println("########################################")
-
 	ikeEncryptionProfiles, err := parent.IKEEncryptionprofiles(&bambou.FetchingInfo{
 		Filter: ikeEncryptionProfileCfg["Name"].(string)})
 	handleError(err, "READ", "IKE Encryption Profile")
@@ -116,7 +97,7 @@ func NuageCreateIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interfac
 	ikeEncryptionProfile := &vspk.IKEEncryptionprofile{}
 
 	if ikeEncryptionProfiles != nil {
-		fmt.Println("IKE Encryption Profile already exists")
+		log.Infof("IKE Encryption Profile already exists")
 
 		ikeEncryptionProfile = ikeEncryptionProfiles[0]
 		errMergo := mergo.Map(ikeEncryptionProfile, ikeEncryptionProfileCfg, mergo.WithOverride)
@@ -134,21 +115,14 @@ func NuageCreateIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interfac
 		ikeEncryptionProfileErr := parent.CreateIKEEncryptionprofile(ikeEncryptionProfile)
 		handleError(ikeEncryptionProfileErr, "CREATE", "IKE Encryption Profile")
 
-		fmt.Println("IKE IKE Encryption Profile created")
+		log.Infof("IKE IKE Encryption Profile created")
 	}
-	fmt.Printf("%#v \n", ikeEncryptionProfile)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", ikeEncryptionProfile)
 	return ikeEncryptionProfile
 }
 
 // NuageCreateIKEGatewayProfile is a wrapper to create a IKE GW Profile in a declaritive way
 func NuageCreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEGatewayProfile {
-	fmt.Println("########################################")
-	fmt.Println("#####   IKE Gateway Profile   ##########")
-	fmt.Println("########################################")
-
 	ikeGatewayProfiles, err := parent.IKEGatewayProfiles(&bambou.FetchingInfo{
 		Filter: ikeGatewayProfileCfg["Name"].(string)})
 	handleError(err, "READ", "IKE Gateway Profile")
@@ -158,7 +132,7 @@ func NuageCreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, p
 	ikeGatewayProfile := &vspk.IKEGatewayProfile{}
 
 	if ikeGatewayProfiles != nil {
-		fmt.Println("IKE Gateway Profile already exists")
+		log.Infof("IKE Gateway Profile already exists")
 
 		ikeGatewayProfile = ikeGatewayProfiles[0]
 		errMergo := mergo.Map(ikeGatewayProfile, ikeGatewayProfileCfg, mergo.WithOverride)
@@ -176,19 +150,16 @@ func NuageCreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, p
 		ikeGatewayProfileErr := parent.CreateIKEGatewayProfile(ikeGatewayProfile)
 		handleError(ikeGatewayProfileErr, "CREATE", "IKE Gateway Profile1")
 
-		fmt.Println("IKE Gateway Profile1 created")
+		log.Infof("IKE Gateway Profile1 created")
 	}
 
-	fmt.Printf("%#v \n", ikeGatewayProfile)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", ikeGatewayProfile)
 	return ikeGatewayProfile
 }
 
 // NuageCreateIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
 func NuageCreateIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.IKEGatewayConnection {
-	log.Println("NuageCreateIKEGatewayConnection started")
+	log.Infof("NuageCreateIKEGatewayConnection started")
 
 	ikeGatewayConns, err := parent.IKEGatewayConnections(&bambou.FetchingInfo{
 		Filter: ikeGatewayConnCfg["Name"].(string)})
@@ -199,7 +170,7 @@ func NuageCreateIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, p
 	ikeGatewayConn := &vspk.IKEGatewayConnection{}
 
 	if ikeGatewayConns != nil {
-		fmt.Println("IKE GW Connection already exists")
+		log.Infof("IKE GW Connection already exists")
 
 		ikeGatewayConn = ikeGatewayConns[0]
 		errMergo := mergo.Map(ikeGatewayConn, ikeGatewayConnCfg, mergo.WithOverride)
@@ -216,11 +187,11 @@ func NuageCreateIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, p
 		ikeGatewayConnErr := parent.CreateIKEGatewayConnection(ikeGatewayConn)
 		handleError(ikeGatewayConnErr, "CREATE", "IKE GW Connection ")
 
-		fmt.Println("IKE GW Connection created")
+		log.Infof("IKE GW Connection created")
 	}
 
-	log.Printf("%#v \n", ikeGatewayConn)
-	log.Println("NuageCreateIKEGatewayConnection finished")
+	log.Infof("%#v \n", ikeGatewayConn)
+	log.Infof("NuageCreateIKEGatewayConnection finished")
 	return ikeGatewayConn
 }
 
@@ -237,11 +208,11 @@ func NuageDeleteIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, p
 	ikeGatewayConn := &vspk.IKEGatewayConnection{}
 
 	if ikeGatewayConns != nil {
-		fmt.Println("IKE GW Connection already exists")
+		log.Infof("IKE GW Connection already exists")
 		ikeGatewayConn = ikeGatewayConns[0]
 		ikeGatewayConn.Delete()
 	}
-	log.Printf("%#v \n", ikeGatewayConn)
-	log.Println("NuageIKEGatewayConnection finished")
+	log.Infof("%#v \n", ikeGatewayConn)
+	log.Infof("NuageIKEGatewayConnection finished")
 	return nil
 }

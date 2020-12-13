@@ -1,19 +1,14 @@
 package nuagewrapper
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
 	"github.com/nuagenetworks/vspk-go/vspk"
+	log "github.com/sirupsen/logrus"
 )
 
 // NuageRateLimiter is a wrapper to create a Rate Limiter in a declaritive way
 func NuageRateLimiter(rateLimiterCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.RateLimiter {
-	fmt.Println("########################################")
-	fmt.Println("#####   Rate Limiter         ##########")
-	fmt.Println("########################################")
 
 	rateLimiters, err := parent.RateLimiters(&bambou.FetchingInfo{
 		Filter: rateLimiterCfg["Name"].(string)})
@@ -24,7 +19,7 @@ func NuageRateLimiter(rateLimiterCfg map[string]interface{}, parent *vspk.Enterp
 	rateLimiter := &vspk.RateLimiter{}
 
 	if rateLimiters != nil {
-		fmt.Println("Rate Limiter already exists")
+		log.Infof("Rate Limiter already exists")
 
 		rateLimiter = rateLimiters[0]
 		errMergo := mergo.Map(rateLimiter, rateLimiterCfg, mergo.WithOverride)
@@ -42,21 +37,15 @@ func NuageRateLimiter(rateLimiterCfg map[string]interface{}, parent *vspk.Enterp
 		err := parent.CreateRateLimiter(rateLimiter)
 		handleError(err, "CREATE", "rateLimiter")
 
-		fmt.Println("rateLimiter created")
+		log.Infof("rateLimiter created")
 	}
 
-	fmt.Printf("%#v \n", rateLimiter)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", rateLimiter)
 	return rateLimiter
 }
 
 // NuageEgressQoSPolicy is a wrapper to create a QoS Policy in a declaritive way
 func NuageEgressQoSPolicy(egressQoSPolicyCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.EgressQOSPolicy {
-	fmt.Println("########################################")
-	fmt.Println("#####   Egress QoS Policy     ##########")
-	fmt.Println("########################################")
 
 	egressQoSPolicies, err := parent.EgressQOSPolicies(&bambou.FetchingInfo{
 		Filter: egressQoSPolicyCfg["Name"].(string)})
@@ -67,7 +56,7 @@ func NuageEgressQoSPolicy(egressQoSPolicyCfg map[string]interface{}, parent *vsp
 	egressQoSPolicy := &vspk.EgressQOSPolicy{}
 
 	if egressQoSPolicies != nil {
-		fmt.Println("QoS Policy already exists")
+		log.Infof("QoS Policy already exists")
 
 		egressQoSPolicy = egressQoSPolicies[0]
 		errMergo := mergo.Map(egressQoSPolicy, egressQoSPolicyCfg, mergo.WithOverride)
@@ -85,21 +74,15 @@ func NuageEgressQoSPolicy(egressQoSPolicyCfg map[string]interface{}, parent *vsp
 		err := parent.CreateEgressQOSPolicy(egressQoSPolicy)
 		handleError(err, "CREATE", "egressQoSPolicy")
 
-		fmt.Println("egressQoSPolicy created")
+		log.Infof("egressQoSPolicy created")
 	}
 
-	fmt.Printf("%#v \n", egressQoSPolicy)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", egressQoSPolicy)
 	return egressQoSPolicy
 }
 
 // NuageCOSRemarkingPolicy is a wrapper to create a COS remarking Policy in a declaritive way
 func NuageCOSRemarkingPolicy(cosRemarkingPolicyCfg map[string]interface{}, parent *vspk.COSRemarkingPolicyTable) *vspk.COSRemarkingPolicy {
-	fmt.Println("########################################")
-	fmt.Println("#####   COS Remarking Policy  ##########")
-	fmt.Println("########################################")
 
 	cosRemarkingPolicies, err := parent.COSRemarkingPolicies(&bambou.FetchingInfo{
 		Filter: cosRemarkingPolicyCfg["DSCP"].(string)})
@@ -110,7 +93,7 @@ func NuageCOSRemarkingPolicy(cosRemarkingPolicyCfg map[string]interface{}, paren
 	cosRemarkingPolicy := &vspk.COSRemarkingPolicy{}
 
 	if cosRemarkingPolicies != nil {
-		fmt.Println("COS Remark Policy Table already exists")
+		log.Infof("COS Remark Policy Table already exists")
 		cosRemarkingPolicy = cosRemarkingPolicies[0]
 		return cosRemarkingPolicy
 	}
@@ -123,20 +106,15 @@ func NuageCOSRemarkingPolicy(cosRemarkingPolicyCfg map[string]interface{}, paren
 	err = parent.CreateCOSRemarkingPolicy(cosRemarkingPolicy)
 	handleError(err, "CREATE", "cosRemarkingPolicy")
 
-	fmt.Println("cosRemarkingPolicy created")
+	log.Infof("cosRemarkingPolicy created")
 
-	fmt.Printf("%#v \n", cosRemarkingPolicy)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", cosRemarkingPolicy)
+
 	return cosRemarkingPolicy
 }
 
 // NuageCOSRemarkingPolicyTable is a wrapper to create a COS remarking Policy in a declaritive way
 func NuageCOSRemarkingPolicyTable(cosRemarkingPolicyTableCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.COSRemarkingPolicyTable {
-	fmt.Println("########################################")
-	fmt.Println("#####   COS Remarking Policy Table #####")
-	fmt.Println("########################################")
 
 	cosRemarkingPolicyTables, err := parent.COSRemarkingPolicyTables(&bambou.FetchingInfo{
 		Filter: cosRemarkingPolicyTableCfg["Name"].(string)})
@@ -147,7 +125,7 @@ func NuageCOSRemarkingPolicyTable(cosRemarkingPolicyTableCfg map[string]interfac
 	cosRemarkingPolicyTable := &vspk.COSRemarkingPolicyTable{}
 
 	if cosRemarkingPolicyTables != nil {
-		fmt.Println("COS Remark Policy Table already exists")
+		log.Infof("COS Remark Policy Table already exists")
 
 		cosRemarkingPolicyTable = cosRemarkingPolicyTables[0]
 		errMergo := mergo.Map(cosRemarkingPolicyTable, cosRemarkingPolicyTableCfg, mergo.WithOverride)
@@ -165,21 +143,16 @@ func NuageCOSRemarkingPolicyTable(cosRemarkingPolicyTableCfg map[string]interfac
 		err := parent.CreateCOSRemarkingPolicyTable(cosRemarkingPolicyTable)
 		handleError(err, "CREATE", "cosRemarkingPolicyTable")
 
-		fmt.Println("cosRemarkingPolicyTable created")
+		log.Infof("cosRemarkingPolicyTable created")
 	}
 
-	fmt.Printf("%#v \n", cosRemarkingPolicyTable)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", cosRemarkingPolicyTable)
+
 	return cosRemarkingPolicyTable
 }
 
 // NuageDSCPRemarkingPolicy is a wrapper to create a DSCP remarking Policy in a declaritive way
 func NuageDSCPRemarkingPolicy(dscpRemarkingPolicyCfg map[string]interface{}, parent *vspk.DSCPRemarkingPolicyTable) *vspk.DSCPRemarkingPolicy {
-	fmt.Println("########################################")
-	fmt.Println("#####  DSCP Remarking Policy  ##########")
-	fmt.Println("########################################")
 
 	dscpRemarkingPolicies, err := parent.DSCPRemarkingPolicies(&bambou.FetchingInfo{
 		Filter: dscpRemarkingPolicyCfg["DSCP"].(string)})
@@ -190,7 +163,7 @@ func NuageDSCPRemarkingPolicy(dscpRemarkingPolicyCfg map[string]interface{}, par
 	dscpRemarkingPolicy := &vspk.DSCPRemarkingPolicy{}
 
 	if dscpRemarkingPolicies != nil {
-		fmt.Println("DSCP Remark Policy  already exists")
+		log.Infof("DSCP Remark Policy  already exists")
 		dscpRemarkingPolicy = dscpRemarkingPolicies[0]
 		return dscpRemarkingPolicy
 	}
@@ -203,20 +176,15 @@ func NuageDSCPRemarkingPolicy(dscpRemarkingPolicyCfg map[string]interface{}, par
 	err = parent.CreateDSCPRemarkingPolicy(dscpRemarkingPolicy)
 	handleError(err, "CREATE", "dscpRemarkingPolicy")
 
-	fmt.Println("dscpRemarkingPolicy created")
+	log.Infof("dscpRemarkingPolicy created")
 
-	fmt.Printf("%#v \n", dscpRemarkingPolicy)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", dscpRemarkingPolicy)
+
 	return dscpRemarkingPolicy
 }
 
 // NuageDSCPRemarkingPolicyTable is a wrapper to create a DSCP remarking Policy in a declaritive way
 func NuageDSCPRemarkingPolicyTable(dscpRemarkingPolicyTableCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.DSCPRemarkingPolicyTable {
-	fmt.Println("########################################")
-	fmt.Println("#####  DSCP Remarking Policy Table #####")
-	fmt.Println("########################################")
 
 	dscpRemarkingPolicyTables, err := parent.DSCPRemarkingPolicyTables(&bambou.FetchingInfo{
 		Filter: dscpRemarkingPolicyTableCfg["Name"].(string)})
@@ -227,7 +195,7 @@ func NuageDSCPRemarkingPolicyTable(dscpRemarkingPolicyTableCfg map[string]interf
 	dscpRemarkingPolicyTable := &vspk.DSCPRemarkingPolicyTable{}
 
 	if dscpRemarkingPolicyTables != nil {
-		fmt.Println("DSCP Remark Policy Table already exists")
+		log.Infof("DSCP Remark Policy Table already exists")
 
 		dscpRemarkingPolicyTable = dscpRemarkingPolicyTables[0]
 		errMergo := mergo.Map(dscpRemarkingPolicyTable, dscpRemarkingPolicyTableCfg, mergo.WithOverride)
@@ -245,12 +213,9 @@ func NuageDSCPRemarkingPolicyTable(dscpRemarkingPolicyTableCfg map[string]interf
 		err := parent.CreateDSCPRemarkingPolicyTable(dscpRemarkingPolicyTable)
 		handleError(err, "CREATE", "dscpRemarkingPolicyTable")
 
-		fmt.Println("dscpRemarkingPolicyTable created")
+		log.Infof("dscpRemarkingPolicyTable created")
 	}
 
-	fmt.Printf("%#v \n", dscpRemarkingPolicyTable)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", dscpRemarkingPolicyTable)
 	return dscpRemarkingPolicyTable
 }

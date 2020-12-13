@@ -1,12 +1,10 @@
 package nuagewrapper
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
 	"github.com/nuagenetworks/vspk-go/vspk"
+	log "github.com/sirupsen/logrus"
 )
 
 // NuageEnterprise is a wrapper to create nuage enterprise in a declaritive way
@@ -17,13 +15,13 @@ func NuageEnterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vsp
 		Filter: enterpriseCfg["Name"].(string)})
 	handleError(err, "Enterprise", "READ")
 
-	fmt.Println("################" + enterpriseCfg["Name"].(string) + "###############")
-	fmt.Println(enterprises)
+	log.Infof("################" + enterpriseCfg["Name"].(string) + "###############")
+	log.Infof(enterprises)
 
 	// init the enterprise struct that will hold either the received object
 	// or will be created from the enterpriseCfg
 	if enterprises != nil {
-		fmt.Println("Enterpise already exists")
+		log.Infof("Enterpise already exists")
 
 		enterprise = enterprises[0]
 		errMergo := mergo.Map(enterprise, enterpriseCfg, mergo.WithOverride)
@@ -40,7 +38,7 @@ func NuageEnterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vsp
 		err := parent.CreateEnterprise(enterprise)
 		handleError(err, "Enterprise", "CREATE")
 
-		fmt.Println("Enterprise created")
+		log.Infof("Enterprise created")
 	}
 	return enterprise
 }
@@ -53,13 +51,13 @@ func NuageEnterpriseprofile(enterpriseProfileCfg map[string]interface{}, parent 
 		Filter: enterpriseProfileCfg["Name"].(string)})
 	handleError(err, "enterpriseProfile", "READ")
 
-	fmt.Println("################" + enterpriseProfileCfg["Name"].(string) + "###############")
-	fmt.Println(enterpriseProfiles)
+	log.Infof("################" + enterpriseProfileCfg["Name"].(string) + "###############")
+	log.Infof(enterpriseProfiles)
 
 	// init the enterprise struct that will hold either the received object
 	// or will be created from the enterpriseProfileCfg
 	if enterpriseProfiles != nil {
-		fmt.Println("enterpriseProfile already exists")
+		log.Infof("enterpriseProfile already exists")
 
 		enterpriseProfile = enterpriseProfiles[0]
 		errMergo := mergo.Map(enterpriseProfile, enterpriseProfileCfg, mergo.WithOverride)
@@ -76,7 +74,7 @@ func NuageEnterpriseprofile(enterpriseProfileCfg map[string]interface{}, parent 
 		err := parent.CreateEnterpriseProfile(enterpriseProfile)
 		handleError(err, "enterpriseProfile", "CREATE")
 
-		fmt.Println("enterpriseProfile created")
+		log.Infof("enterpriseProfile created")
 	}
 	return enterpriseProfile
 }

@@ -1,13 +1,12 @@
 package nuagewrapper
 
 import (
-	"fmt"
-	"log"
 	"strings"
 
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
 	"github.com/nuagenetworks/vspk-go/vspk"
+	log "github.com/sirupsen/logrus"
 )
 
 // NuageNetworkVlanCfg defines the structure of a network VLAN for an NSG
@@ -66,22 +65,19 @@ type NuageNSGCfg struct {
 
 // NuageCreateEntireNSG is a wrapper to create a complete NSG in a declaritive way
 func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk.Me) *vspk.NSGateway {
-	fmt.Println("########################################")
-	fmt.Println("#####  Create Entire NSG GW   ##########")
-	fmt.Println("########################################")
 
 	nsGatewayTemplateCfg := map[string]interface{}{
 		"Name": nsgCfg.NSGTemplateName,
 	}
-	//fmt.Printf("NSG Template ID: %s \n", nsgCfg.NSGTemplateID)
+	//log.Infof("NSG Template ID: %s \n", nsgCfg.NSGTemplateID)
 
 	nsGatewayTemplate := NuageNSGatewayTemplate(nsGatewayTemplateCfg, Usr)
 	nsgCfg.NSGTemplateID = nsGatewayTemplate.ID
-	//fmt.Printf("NSG Template ID: %s \n", nsgCfg.NSGTemplateID)
+	//flog.Infof("NSG Template ID: %s \n", nsgCfg.NSGTemplateID)
 
-	fmt.Printf("NSG Template Name: %s \n", nsgCfg.NSGTemplateName)
-	fmt.Printf("NSG Template Personality: %s \n", nsGatewayTemplate.Personality)
-	fmt.Printf("NSG Template ID: %s \n", nsgCfg.NSGTemplateID)
+	log.Infof("NSG Template Name: %s ", nsgCfg.NSGTemplateName)
+	log.Infof("NSG Template Personality: %s ", nsGatewayTemplate.Personality)
+	log.Infof("NSG Template ID: %s ", nsgCfg.NSGTemplateID)
 
 	networkAcceleration := nsgCfg.NetworkAcceleration
 	if nsgCfg.ShuntPorts != nil {
@@ -118,7 +114,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 	//time.Sleep(15 * time.Second)
 
 	for i, port := range nsgCfg.NetworkPorts {
-		fmt.Printf("NSG Network Port %d Name: %s \n", i, port.Name)
+		log.Infof("NSG Network Port %d Name: %s \n", i, port.Name)
 
 		nsPortCfg := map[string]interface{}{
 			"Name":            port.Name,
@@ -130,7 +126,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 		}
 		nsPort := NuageNSGPort(nsPortCfg, nsGateway)
 
-		fmt.Printf("Port: %#v \n", nsPort)
+		log.Infof("Port: %#v \n", nsPort)
 
 		for _, vlan := range port.Vlan {
 			var nsVlanCfg map[string]interface{}
@@ -141,7 +137,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				vscProf := NuageInfraVscProfile(vscProfCfg, Usr)
 				vlan.VscID = vscProf.ID
 
-				//fmt.Printf("VSC NEEDED for vlan: %s with VSC ID: %s", vlan.VlanID, vlan.VscID)
+				//log.Infof("VSC NEEDED for vlan: %s with VSC ID: %s", vlan.VlanID, vlan.VscID)
 				//time.Sleep(5 * time.Second)
 
 				nsVlanCfg = map[string]interface{}{
@@ -156,7 +152,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 					}
 				}
 			} else {
-				//fmt.Printf("NOOOOOOOOOOOOOOO VSC NEEDED for vlan: %s with VSC ID: %s", vlan.VlanID, vlan.VscID)
+				//log.Infof("NOOOOOOOOOOOOOOO VSC NEEDED for vlan: %s with VSC ID: %s", vlan.VlanID, vlan.VscID)
 				//time.Sleep(5 * time.Second)
 				nsVlanCfg = map[string]interface{}{
 					"Value": vlan.VlanID,
@@ -169,9 +165,9 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				}
 			}
 
-			fmt.Printf("VLANCfg: %#v \n", nsVlanCfg)
+			log.Infof("VLANCfg: %#v \n", nsVlanCfg)
 			nsVlan := NuageVlan(nsVlanCfg, nsPort)
-			fmt.Printf("Port: %#v \n", nsVlan)
+			log.Infof("Port: %#v \n", nsVlan)
 
 			var patEnabled = true
 			var underlayEnabled = true
@@ -188,18 +184,18 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				addressV4 = vlan.Address
 				netmaskV4 = vlan.Netmask
 				gatewayV4 = vlan.Gateway
-				fmt.Printf("BRANCH IPV4 AND STATIC ADDRESSING MODE \n")
+				log.Infof("BRANCH IPV4 AND STATIC ADDRESSING MODE \n")
 			} else if vlan.AddressFamily == "IPV6" && vlan.Mode == "Static" {
 				dnsV6 = vlan.DNS
 				addressV6 = vlan.Address
 				gatewayV6 = vlan.Gateway
 				patEnabled = false
 				underlayEnabled = false
-				fmt.Printf("BRANCH IPV6 AND STATIC ADDRESSING MODE \n")
+				log.Infof("BRANCH IPV6 AND STATIC ADDRESSING MODE \n")
 			} else if vlan.AddressFamily == "IPV6" {
 				patEnabled = false
 				underlayEnabled = false
-				fmt.Printf("BRANCH IPV6 AND DYNAMIC ADDRESSING MODE \n")
+				log.Infof("BRANCH IPV6 AND DYNAMIC ADDRESSING MODE \n")
 			}
 
 			var uplinkConnectionCfg map[string]interface{}
@@ -208,7 +204,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 					"Name": vlan.UnderlayName,
 				}
 				underlay := NuageUnderlay(underlayCfg, Usr)
-				fmt.Println(underlay)
+				log.Infof("Underlay: %v", underlay)
 				vlan.UnderlayID = underlay.ID
 
 				if vlan.DucVlan == true {
@@ -262,12 +258,12 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				}
 			}
 
-			fmt.Println(uplinkConnectionCfg)
+			//log.Infof(uplinkConnectionCfg)
 
 			uplinkConn := NuageUplinkConnection(uplinkConnectionCfg, nsVlan)
 
 			if strings.Contains(port.Name, "lte") {
-				fmt.Println("LTE")
+				log.Infof("LTE")
 
 				customePropCfg := map[string]interface{}{
 					"AttributeName":  "apn",
@@ -318,13 +314,13 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				}
 
 			} else {
-				fmt.Println("ETHERNET")
+				log.Infof("ETHERNET")
 			}
 		}
 
 	}
 	for i, port := range nsgCfg.ShuntPorts {
-		fmt.Printf("NSG Shunt Port %d Name: %s \n", i, port.Name)
+		log.Infof("NSG Shunt Port %d Name: %s \n", i, port.Name)
 
 		nsPortCfg := map[string]interface{}{
 			"Name":            port.Name,
@@ -345,9 +341,9 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				"ShuntVLAN":   true,
 			}
 
-			fmt.Printf("VLANCfg: %s \n", nsVlanCfg)
+			log.Infof("VLANCfg: %s \n", nsVlanCfg)
 			nsVlan := NuageVlan(nsVlanCfg, nsPort)
-			fmt.Println(nsVlan)
+			//log.Infof(nsVlan)
 
 			uplinkConnCfg := map[string]interface{}{
 				"PATEnabled":    true,
@@ -366,12 +362,12 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			}
 
 			uplinkConn := NuageUplinkConnection(uplinkConnCfg, nsVlan)
-			fmt.Println(uplinkConn)
+			//log.Infof(uplinkConn)
 		}
 
 	}
 	for i, port := range nsgCfg.AccessPorts {
-		fmt.Printf("NSG Access Port %d Name: %s \n", i, port.Name)
+		log.Infof("NSG Access Port %d Name: %s \n", i, port.Name)
 
 		nsPortCfg := map[string]interface{}{
 			"Name":         port.Name,
@@ -385,14 +381,14 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			nsVlanCfg := map[string]interface{}{
 				"Value": vlan.VlanID,
 			}
-			fmt.Printf("Access VLANCfg: %#v \n", nsVlanCfg)
+			log.Infof("Access VLANCfg: %#v \n", nsVlanCfg)
 			nsVlan := NuageVlan(nsVlanCfg, nsPort)
-			fmt.Println(nsVlan)
+			//log.Infof(nsVlan)
 		}
 
 	}
 	for i, port := range nsgCfg.WifiPorts {
-		fmt.Printf("NSG Wifi Port %d Name: %s \n", i, port.Name)
+		log.Infof("NSG Wifi Port %d Name: %s \n", i, port.Name)
 
 		nsPortCfg := map[string]interface{}{
 			"Name":              port.Name,
@@ -409,21 +405,15 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			"BroadcastSSID":      true,
 		}
 		ssidConn := NuageSSIDConnection(ssidConnCfg, nsPort)
-		fmt.Println(ssidConn)
+		//log.Infof(ssidConn)
 	}
 
-	fmt.Printf("%#v \n", nsGateway)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsGateway)
 	return nsGateway
 }
 
 // NuageNSGatewayTemplate is a wrapper to create nuage NS Gateway template in a declaritive way
 func NuageNSGatewayTemplate(nsGatewayTemplateCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGatewayTemplate {
-	fmt.Println("########################################")
-	fmt.Println("#####     NSGateway template   #########")
-	fmt.Println("########################################")
 
 	nsGatewayTemplate := &vspk.NSGatewayTemplate{}
 
@@ -434,7 +424,7 @@ func NuageNSGatewayTemplate(nsGatewayTemplateCfg map[string]interface{}, parent 
 	// init the struct that will hold either the received object
 	// or will be created from the Cfg object
 	if nsGatewayTemplates != nil {
-		fmt.Println("nsGatewayTemplate already exists")
+		log.Infof("nsGatewayTemplate already exists")
 
 		nsGatewayTemplate = nsGatewayTemplates[0]
 		errMergo := mergo.Map(nsGatewayTemplate, nsGatewayTemplateCfg, mergo.WithOverride)
@@ -452,20 +442,14 @@ func NuageNSGatewayTemplate(nsGatewayTemplateCfg map[string]interface{}, parent 
 		err := parent.CreateNSGatewayTemplate(nsGatewayTemplate)
 		handleError(err, "nsGatewayTemplate", "CREATE")
 
-		fmt.Println("nsGatewayTemplate created")
+		log.Infof("nsGatewayTemplate created")
 	}
-	fmt.Printf("%#v \n", nsGatewayTemplate)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsGatewayTemplate)
 	return nsGatewayTemplate
 }
 
 // NuageNSGRoot is a wrapper to create nuage NS Gateway in a declaritive way
 func NuageNSGRoot(nsGatewayCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGateway {
-	fmt.Println("########################################")
-	fmt.Println("#####        NSG Gateway      ##########")
-	fmt.Println("########################################")
 
 	nsGateways, err := parent.NSGateways(&bambou.FetchingInfo{
 		Filter: nsGatewayCfg["Name"].(string)})
@@ -476,7 +460,7 @@ func NuageNSGRoot(nsGatewayCfg map[string]interface{}, parent *vspk.Me) *vspk.NS
 	nsGateway := &vspk.NSGateway{}
 
 	if nsGateways != nil {
-		fmt.Println("NS Gateway already exists")
+		log.Infof("NS Gateway already exists")
 
 		nsGateway = nsGateways[0]
 		errMergo := mergo.Map(nsGateway, nsGatewayCfg, mergo.WithOverride)
@@ -490,28 +474,21 @@ func NuageNSGRoot(nsGatewayCfg map[string]interface{}, parent *vspk.Me) *vspk.NS
 		if errMergo != nil {
 			log.Fatal(errMergo)
 		}
-		//fmt.Printf("nsGateway: %#v", nsGateway)
+		//log.Infof("nsGateway: %#v", nsGateway)
 		//time.Sleep(15 * time.Second)
 
 		err := parent.CreateNSGateway(nsGateway)
 		handleError(err, "CREATE", "NS Gateway ")
 
-		fmt.Println("NS Gateway created")
+		log.Infof("NS Gateway created")
 	}
 
-	fmt.Printf("%#v \n", nsGateway)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsGateway)
 	return nsGateway
 }
 
 // NuageNSG is a wrapper to create nuage NS Gateway in a declaritive way
 func NuageNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSGateway {
-	fmt.Println("########################################")
-	fmt.Println("#####        NSG Gateway      ##########")
-	fmt.Println("########################################")
-
 	nsGateways, err := parent.NSGateways(&bambou.FetchingInfo{
 		Filter: nsGatewayCfg["Name"].(string)})
 	handleError(err, "READ", "NS Gateway")
@@ -521,7 +498,7 @@ func NuageNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vsp
 	nsGateway := &vspk.NSGateway{}
 
 	if nsGateways != nil {
-		fmt.Println("NS Gateway already exists")
+		log.Infof("NS Gateway already exists")
 
 		nsGateway = nsGateways[0]
 		errMergo := mergo.Map(nsGateway, nsGatewayCfg, mergo.WithOverride)
@@ -538,21 +515,15 @@ func NuageNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vsp
 		err := parent.CreateNSGateway(nsGateway)
 		handleError(err, "CREATE", "NS Gateway ")
 
-		fmt.Println("NS Gateway created")
+		log.Infof("NS Gateway created")
 	}
 
-	fmt.Printf("%#v \n", nsGateway)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsGateway)
 	return nsGateway
 }
 
 // NuageNSGRedundantGwGroup is a wrapper to create nuage NS Gateway redundant Group in a declaritive way
 func NuageNSGRedundantGwGroup(nsRedundantGwGroupCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSRedundantGatewayGroup {
-	fmt.Println("############################################")
-	fmt.Println("##### NSG redundant Gateway Group ##########")
-	fmt.Println("############################################")
 
 	nsRedundantGwGroups, err := parent.NSRedundantGatewayGroups(&bambou.FetchingInfo{
 		Filter: nsRedundantGwGroupCfg["Name"].(string)})
@@ -563,7 +534,7 @@ func NuageNSGRedundantGwGroup(nsRedundantGwGroupCfg map[string]interface{}, pare
 	nsRedundantGwGroup := &vspk.NSRedundantGatewayGroup{}
 
 	if nsRedundantGwGroups != nil {
-		fmt.Println("NS Gateway redudant group already exists")
+		log.Infof("NS Gateway redudant group already exists")
 
 		nsRedundantGwGroup = nsRedundantGwGroups[0]
 		errMergo := mergo.Map(nsRedundantGwGroup, nsRedundantGwGroupCfg, mergo.WithOverride)
@@ -580,21 +551,15 @@ func NuageNSGRedundantGwGroup(nsRedundantGwGroupCfg map[string]interface{}, pare
 		err := parent.CreateNSRedundantGatewayGroup(nsRedundantGwGroup)
 		handleError(err, "CREATE", "NS Gateway redudant group")
 
-		fmt.Println("NS Gateway redudant group created")
+		log.Infof("NS Gateway redudant group created")
 	}
 
-	fmt.Printf("%#v \n", nsRedundantGwGroup)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsRedundantGwGroup)
 	return nsRedundantGwGroup
 }
 
 // NuageShuntLink is a wrapper to create a NSG shunt link in a declaritive way
 func NuageShuntLink(shuntLinkCfg map[string]interface{}, parent *vspk.NSRedundantGatewayGroup) *vspk.ShuntLink {
-	fmt.Println("########################################")
-	fmt.Println("#####        NSG shunt Link   ##########")
-	fmt.Println("########################################")
 
 	shuntLinks, err := parent.ShuntLinks(&bambou.FetchingInfo{
 		Filter: shuntLinkCfg["Name"].(string)})
@@ -605,7 +570,7 @@ func NuageShuntLink(shuntLinkCfg map[string]interface{}, parent *vspk.NSRedundan
 	shuntLink := &vspk.ShuntLink{}
 
 	if shuntLinks != nil {
-		fmt.Println("NS shunt Link already exists")
+		log.Infof("NS shunt Link already exists")
 
 		shuntLink = shuntLinks[0]
 		errMergo := mergo.Map(shuntLink, shuntLinkCfg, mergo.WithOverride)
@@ -615,32 +580,26 @@ func NuageShuntLink(shuntLinkCfg map[string]interface{}, parent *vspk.NSRedundan
 
 		shuntLink.Save()
 	} else {
-		fmt.Printf("shuntLink: %#v \n", shuntLink)
-		fmt.Printf("shuntLink: %#v \n", shuntLinkCfg)
+		log.Infof("shuntLink: %#v \n", shuntLink)
+		log.Infof("shuntLink: %#v \n", shuntLinkCfg)
 		errMergo := mergo.Map(shuntLink, shuntLinkCfg, mergo.WithOverride)
 		if errMergo != nil {
 			log.Fatal(errMergo)
 		}
-		fmt.Printf("shuntLink: %#v \n", shuntLink)
-		fmt.Printf("shuntLink: %#v \n", shuntLinkCfg)
+		log.Infof("shuntLink: %#v \n", shuntLink)
+		log.Infof("shuntLink: %#v \n", shuntLinkCfg)
 		err := parent.CreateShuntLink(shuntLink)
 		handleError(err, "CREATE", "NS Shunt Link ")
 
-		fmt.Println("NS Shunt Link created")
+		log.Infof("NS Shunt Link created")
 	}
 
-	fmt.Printf("%#v \n", shuntLink)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", shuntLink)
 	return shuntLink
 }
 
 // NuageNSGRedundantPort is a wrapper to create a NSG redundant Port in a declaritive way
 func NuageNSGRedundantPort(nsRedundantPortCfg map[string]interface{}, parent *vspk.NSRedundantGatewayGroup) *vspk.RedundantPort {
-	fmt.Println("########################################")
-	fmt.Println("#####   NSG Redundant Port    ##########")
-	fmt.Println("########################################")
 
 	nsRedundantPorts, err := parent.RedundantPorts(&bambou.FetchingInfo{
 		Filter: nsRedundantPortCfg["Name"].(string)})
@@ -651,7 +610,7 @@ func NuageNSGRedundantPort(nsRedundantPortCfg map[string]interface{}, parent *vs
 	nsRedundantPort := &vspk.RedundantPort{}
 
 	if nsRedundantPorts != nil {
-		fmt.Println("NS redundant Port already exists")
+		log.Infof("NS redundant Port already exists")
 
 		nsRedundantPort = nsRedundantPorts[0]
 		errMergo := mergo.Map(nsRedundantPort, nsRedundantPortCfg, mergo.WithOverride)
@@ -665,25 +624,20 @@ func NuageNSGRedundantPort(nsRedundantPortCfg map[string]interface{}, parent *vs
 		if errMergo != nil {
 			log.Fatal(errMergo)
 		}
-		fmt.Println(nsRedundantPortCfg)
+		log.Infof(nsRedundantPortCfg)
 		err := parent.CreateRedundantPort(nsRedundantPort)
 		handleError(err, "CREATE", "NS Redundant Port ")
 
-		fmt.Println("NS Redundant Port created")
+		log.Infof("NS Redundant Port created")
 	}
 
-	fmt.Printf("%#v \n", nsRedundantPort)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsRedundantPort)
+
 	return nsRedundantPort
 }
 
 // NuageNSGPort is a wrapper to create a NSG Port in a declaritive way
 func NuageNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.NSPort {
-	fmt.Println("########################################")
-	fmt.Println("#####        NSG Port         ##########")
-	fmt.Println("########################################")
 
 	nsPorts, err := parent.NSPorts(&bambou.FetchingInfo{
 		Filter: nsPortCfg["Name"].(string)})
@@ -694,7 +648,7 @@ func NuageNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vsp
 	nsPort := &vspk.NSPort{}
 
 	if nsPorts != nil {
-		fmt.Println("NS Port already exists")
+		log.Infof("NS Port already exists")
 
 		nsPort = nsPorts[0]
 		errMergo := mergo.Map(nsPort, nsPortCfg, mergo.WithOverride)
@@ -708,25 +662,19 @@ func NuageNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vsp
 		if errMergo != nil {
 			log.Fatal(errMergo)
 		}
-		fmt.Println(nsPortCfg)
+		//log.Infof(nsPortCfg)
 		err := parent.CreateNSPort(nsPort)
 		handleError(err, "CREATE", "NS Port ")
 
-		fmt.Println("NS Port created")
+		log.Infof("NS Port created")
 	}
 
-	fmt.Printf("%#v \n", nsPort)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsPort)
 	return nsPort
 }
 
 // NuageNSGWirelessPort is a wrapper to create a NSG Wireless Port in a declaritive way
 func NuageNSGWirelessPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.WirelessPort {
-	fmt.Println("########################################")
-	fmt.Println("#####  NSG Wireless Port      ##########")
-	fmt.Println("########################################")
 
 	nsPorts, err := parent.WirelessPorts(&bambou.FetchingInfo{
 		Filter: nsPortCfg["Name"].(string)})
@@ -737,7 +685,7 @@ func NuageNSGWirelessPort(nsPortCfg map[string]interface{}, parent *vspk.NSGatew
 	nsPort := &vspk.WirelessPort{}
 
 	if nsPorts != nil {
-		fmt.Println("Wireless Port already exists")
+		log.Infof("Wireless Port already exists")
 
 		nsPort = nsPorts[0]
 		errMergo := mergo.Map(nsPort, nsPortCfg, mergo.WithOverride)
@@ -754,23 +702,17 @@ func NuageNSGWirelessPort(nsPortCfg map[string]interface{}, parent *vspk.NSGatew
 		err := parent.CreateWirelessPort(nsPort)
 		handleError(err, "CREATE", "Wireless Port ")
 
-		fmt.Println("Wireless Port created")
+		log.Infof("Wireless Port created")
 	}
 
-	fmt.Printf("%#v \n", nsPort)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsPort)
 	return nsPort
 }
 
 // NuageredundantVlan is a wrapper to create a NSG VLAN in a declaritive way
 func NuageredundantVlan(nsVlanCfg map[string]interface{}, parent *vspk.RedundantPort) *vspk.VLAN {
-	fmt.Println("########################################")
-	fmt.Println("#####        NSG Vlan         ##########")
-	fmt.Println("########################################")
 
-	fmt.Printf("VLAN Cfg: %#v \n", nsVlanCfg)
+	log.Infof("VLAN Cfg: %#v \n", nsVlanCfg)
 	nsVlans, err := parent.VLANs(&bambou.FetchingInfo{
 		Filter: fmt.Sprintf("value == %d", nsVlanCfg["Value"])})
 
@@ -780,10 +722,10 @@ func NuageredundantVlan(nsVlanCfg map[string]interface{}, parent *vspk.Redundant
 	// or will be created from the nsVlanCfg
 	nsVlan := &vspk.VLAN{}
 
-	fmt.Printf("VLANs %#v \n", nsVlans)
+	log.Infof("VLANs %#v \n", nsVlans)
 
 	if nsVlans != nil {
-		fmt.Println("NS VLAN RG already exists")
+		log.Infof("NS VLAN RG already exists")
 
 		nsVlan = nsVlans[0]
 		errMergo := mergo.Map(nsVlan, nsVlanCfg, mergo.WithOverride)
@@ -799,28 +741,22 @@ func NuageredundantVlan(nsVlanCfg map[string]interface{}, parent *vspk.Redundant
 		}
 		//nsVlan.Value, _ = strconv.Atoi("0")
 		//nsVlan.Value = 0
-		fmt.Printf("VLAN: %#v \n", nsVlan)
-		fmt.Printf("Port: %#v \n", parent)
+		log.Infof("VLAN: %#v ", nsVlan)
+		log.Infof("Port: %#v ", parent)
 		err := parent.CreateVLAN(nsVlan)
 		handleError(err, "CREATE", "NS VLAN ")
 
-		fmt.Println("NS VLAN RG created")
+		//log.Infof("NS VLAN RG created")
 	}
 
-	fmt.Printf("%#v \n", nsVlan)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsVlan)
 	return nsVlan
 }
 
 // NuageVlan is a wrapper to create a NSG VLAN in a declaritive way
 func NuageVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN {
-	fmt.Println("########################################")
-	fmt.Println("#####        NSG Vlan         ##########")
-	fmt.Println("########################################")
 
-	fmt.Printf("VLAN Cfg: %#v \n", nsVlanCfg)
+	log.Infof("VLAN Cfg: %#v \n", nsVlanCfg)
 	nsVlans, err := parent.VLANs(&bambou.FetchingInfo{
 		Filter: fmt.Sprintf("value == %d", nsVlanCfg["Value"])})
 
@@ -830,10 +766,10 @@ func NuageVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN
 	// or will be created from the nsVlanCfg
 	nsVlan := &vspk.VLAN{}
 
-	fmt.Printf("VLANs %#v \n", nsVlans)
+	log.Infof("VLANs %#v \n", nsVlans)
 
 	if nsVlans != nil {
-		fmt.Println("NS VLAN already exists")
+		flog.Infof("NS VLAN already exists")
 
 		nsVlan = nsVlans[0]
 		errMergo := mergo.Map(nsVlan, nsVlanCfg, mergo.WithOverride)
@@ -849,26 +785,20 @@ func NuageVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN
 		}
 		//nsVlan.Value, _ = strconv.Atoi("0")
 		//nsVlan.Value = 0
-		fmt.Printf("VLAN: %#v \n", nsVlan)
-		fmt.Printf("Port: %#v \n", parent)
+		log.Infof("VLAN: %#v \n", nsVlan)
+		log.Infof("Port: %#v \n", parent)
 		err := parent.CreateVLAN(nsVlan)
 		handleError(err, "CREATE", "NS VLAN ")
 
-		fmt.Println("NS VLAN created")
+		log.Infof("NS VLAN created")
 	}
 
-	fmt.Printf("%#v \n", nsVlan)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", nsVlan)
 	return nsVlan
 }
 
 // NuageSSIDConnection is a wrapper to create a NSG SSID in a declaritive way
 func NuageSSIDConnection(ssidConnCfg map[string]interface{}, parent *vspk.WirelessPort) *vspk.SSIDConnection {
-	fmt.Println("########################################")
-	fmt.Println("#####   SSID Connection       ##########")
-	fmt.Println("########################################")
 
 	ssidConns, err := parent.SSIDConnections(&bambou.FetchingInfo{
 		Filter: ssidConnCfg["Name"].(string)})
@@ -877,7 +807,7 @@ func NuageSSIDConnection(ssidConnCfg map[string]interface{}, parent *vspk.Wirele
 	ssidConn := &vspk.SSIDConnection{}
 
 	if ssidConns != nil {
-		fmt.Println("SSiD Connection already exists")
+		log.Infof("SSiD Connection already exists")
 
 		ssidConn = ssidConns[0]
 		errMergo := mergo.Map(ssidConn, ssidConnCfg, mergo.WithOverride)
@@ -895,21 +825,15 @@ func NuageSSIDConnection(ssidConnCfg map[string]interface{}, parent *vspk.Wirele
 		err := parent.CreateSSIDConnection(ssidConn)
 		handleError(err, "CREATE", "SSiD Connection")
 
-		fmt.Println("SSiD Connection created")
+		log.Infof("SSiD Connection created")
 	}
 
-	fmt.Printf("%#v \n", ssidConn)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", ssidConn)
 	return ssidConn
 }
 
 // NuageUplinkConnection is a wrapper to create a NSG uplink connection in a declaritive way
 func NuageUplinkConnection(uplinkConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.UplinkConnection {
-	fmt.Println("########################################")
-	fmt.Println("#####   NSG Uplink Connection ##########")
-	fmt.Println("########################################")
 
 	uplinkConns, err := parent.UplinkConnections(&bambou.FetchingInfo{})
 
@@ -918,7 +842,7 @@ func NuageUplinkConnection(uplinkConnCfg map[string]interface{}, parent *vspk.VL
 	uplinkConn := &vspk.UplinkConnection{}
 
 	if uplinkConns != nil {
-		fmt.Println("Uplink Connection already exists")
+		log.Infof("Uplink Connection already exists")
 
 		uplinkConn = uplinkConns[0]
 		errMergo := mergo.Map(uplinkConn, uplinkConnCfg, mergo.WithOverride)
@@ -928,32 +852,26 @@ func NuageUplinkConnection(uplinkConnCfg map[string]interface{}, parent *vspk.VL
 
 		uplinkConn.Save()
 	} else {
-		fmt.Printf("Uplink Connection Cfg: %#v \n", uplinkConnCfg)
+		log.Infof("Uplink Connection Cfg: %#v \n", uplinkConnCfg)
 		errMergo := mergo.Map(uplinkConn, uplinkConnCfg, mergo.WithOverride)
 		if errMergo != nil {
 			log.Fatal(errMergo)
 		}
-		fmt.Printf("Uplink Connection: %#v \n", uplinkConn)
-		fmt.Printf("Uplink Connection Cfg: %#v \n", uplinkConnCfg)
+		log.Infof("Uplink Connection: %#v \n", uplinkConn)
+		log.Infof("Uplink Connection Cfg: %#v \n", uplinkConnCfg)
 
 		err = parent.CreateUplinkConnection(uplinkConn)
 		handleError(err, "CREATE", "Uplink Connection")
 
-		fmt.Println("Uplink Connection created")
+		log.Infof("Uplink Connection created")
 	}
 
-	fmt.Printf("%#v \n", uplinkConn)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", uplinkConn)
 	return uplinkConn
 }
 
 // NuageCustomProperty is a wrapper to create a NSG Custom Property on a port in a declaritive way
 func NuageCustomProperty(customePropCfg map[string]interface{}, parent *vspk.UplinkConnection) *vspk.CustomProperty {
-	fmt.Println("########################################")
-	fmt.Println("#####   Custom property       ##########")
-	fmt.Println("########################################")
 
 	customeProps, err := parent.CustomProperties(&bambou.FetchingInfo{
 		Filter: customePropCfg["AttributeName"].(string)})
@@ -964,7 +882,7 @@ func NuageCustomProperty(customePropCfg map[string]interface{}, parent *vspk.Upl
 	customeProp := &vspk.CustomProperty{}
 
 	if customeProps != nil {
-		fmt.Println("Custom property already exists")
+		log.Infof("Custom property already exists")
 
 		customeProp = customeProps[0]
 		errMergo := mergo.Map(customeProp, customePropCfg, mergo.WithOverride)
@@ -982,12 +900,10 @@ func NuageCustomProperty(customePropCfg map[string]interface{}, parent *vspk.Upl
 		err := parent.CreateCustomProperty(customeProp)
 		handleError(err, "CREATE", "Custome Property")
 
-		fmt.Println("Custome Property created")
+		log.Infof("Custome Property created")
 	}
 
-	fmt.Printf("%#v \n", customeProp)
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
-	fmt.Println("****************************************")
+	log.Infof("%#v \n", customeProp)
+
 	return customeProp
 }

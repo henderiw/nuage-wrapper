@@ -1,20 +1,19 @@
 package nuagewrapper
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"strconv"
 
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
 	"github.com/nuagenetworks/vspk-go/vspk"
+	log "github.com/sirupsen/logrus"
 )
 
 func handleError(err *bambou.Error, t string, o string) {
 	if err != nil {
-		fmt.Println("Unable to " + o + " \"" + t + "\": " + err.Description)
-		fmt.Printf("Error: %#v \n", err)
+		log.Errorf("Unable to " + o + " \"" + t + "\": " + err.Description)
+		log.Errorf("Error: %#v \n", err)
 		os.Exit(1)
 	}
 }
@@ -27,7 +26,7 @@ func NuageLicense(l string, parent *vspk.Me) {
 	err := parent.CreateLicense(license)
 	handleError(err, "License", "CREATE")
 
-	fmt.Println("License created")
+	log.Infof("License created")
 }
 
 // NuageUser is a wrapper to create nuage user in a declaritive way
@@ -38,13 +37,13 @@ func NuageUser(userCfg map[string]interface{}, parent *vspk.Me) *vspk.User {
 		Filter: userCfg["UserName"].(string)})
 	handleError(err, "User", "READ")
 
-	fmt.Println("################" + userCfg["UserName"].(string) + "###############")
-	fmt.Println(users)
+	log.Infof("################" + userCfg["UserName"].(string) + "###############")
+	log.Infof(users)
 
 	// init the user struct that will hold either the received object
 	// or will be created from the userCfg
 	if users != nil {
-		fmt.Println("User already exists")
+		log.Infof"User already exists")
 
 		user = users[0]
 		errMergo := mergo.Map(user, userCfg, mergo.WithOverride)
@@ -61,7 +60,7 @@ func NuageUser(userCfg map[string]interface{}, parent *vspk.Me) *vspk.User {
 		err := parent.CreateUser(user)
 		handleError(err, "User", "CREATE")
 
-		fmt.Println("user created")
+		log.Infof("user created")
 	}
 	return user
 }
@@ -76,10 +75,10 @@ func NuageAssignUser(user *vspk.User, groupCfg map[string]interface{}, parent *v
 		Filter: enterpriseCfg["Name"].(string)})
 	handleError(err, "User", "READ")
 
-	fmt.Println("Number of enterprises retrieved: " + strconv.Itoa(len(enterprises)))
+	log.Infof("Number of enterprises retrieved: " + strconv.Itoa(len(enterprises)))
 
 	for _, enterprise := range enterprises {
-		fmt.Println(enterprise.Name)
+		log.Infof(enterprise.Name)
 	}
 
 	groups, err := enterprises[0].Groups(&bambou.FetchingInfo{
@@ -87,7 +86,7 @@ func NuageAssignUser(user *vspk.User, groupCfg map[string]interface{}, parent *v
 	handleError(err, "Group", "READ")
 
 	for _, group := range groups {
-		fmt.Printf("Group: %#v \n", group)
+		log.Infof("Group: %#v \n", group)
 	}
 
 	return ""
