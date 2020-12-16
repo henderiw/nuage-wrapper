@@ -18,8 +18,8 @@ func handleError(err *bambou.Error, t string, o string) {
 	}
 }
 
-// NuageLicense is a wrapper to create nuage license in a declaritive way
-func NuageLicense(l string, parent *vspk.Me) {
+// License is a wrapper to create nuage license in a declaritive way
+func License(l string, parent *vspk.Me) {
 	license := &vspk.License{}
 	license.License = l
 
@@ -29,8 +29,8 @@ func NuageLicense(l string, parent *vspk.Me) {
 	log.Infof("License created")
 }
 
-// NuageUser is a wrapper to create nuage user in a declaritive way
-func NuageUser(userCfg map[string]interface{}, parent *vspk.Me) *vspk.User {
+// User is a wrapper to create nuage user in a declaritive way
+func User(userCfg map[string]interface{}, parent *vspk.Me) *vspk.User {
 	user := &vspk.User{}
 
 	users, err := parent.Users(&bambou.FetchingInfo{
@@ -65,8 +65,8 @@ func NuageUser(userCfg map[string]interface{}, parent *vspk.Me) *vspk.User {
 	return user
 }
 
-// NuageAssignUser is a wrapper to assign nuage user to a group
-func NuageAssignUser(user *vspk.User, groupCfg map[string]interface{}, parent *vspk.Me) string {
+// AssignUser is a wrapper to assign nuage user to a group
+func AssignUser(user *vspk.User, groupCfg map[string]interface{}, parent *vspk.Me) string {
 	enterpriseCfg := map[string]interface{}{
 		"Name": "Shared Infrastructure",
 	}

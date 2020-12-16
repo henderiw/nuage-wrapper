@@ -7,8 +7,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// NuageDomainTemplate is a wrapper to create nuage domain template in a declaritive way
-func NuageDomainTemplate(domainTemplateCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.DomainTemplate {
+// DomainTemplate is a wrapper to create nuage domain template in a declaritive way
+func DomainTemplate(domainTemplateCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.DomainTemplate {
 	domainTemplate := &vspk.DomainTemplate{}
 
 	domainTemplates, err := parent.DomainTemplates(&bambou.FetchingInfo{
@@ -43,8 +43,8 @@ func NuageDomainTemplate(domainTemplateCfg map[string]interface{}, parent *vspk.
 	return domainTemplate
 }
 
-// NuageDomain is a wrapper to create nuage domain in a declaritive way
-func NuageDomain(domainCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.Domain {
+// Domain is a wrapper to create nuage domain in a declaritive way
+func Domain(domainCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.Domain {
 	domains, err := parent.Domains(&bambou.FetchingInfo{
 		Filter: domainCfg["Name"].(string)})
 	handleError(err, "READ", "Domain")
@@ -77,8 +77,8 @@ func NuageDomain(domainCfg map[string]interface{}, parent *vspk.Enterprise) *vsp
 	return domain
 }
 
-// NuageZone is a wrapper to create nuage zone in a declaritive way
-func NuageZone(zoneCfg map[string]interface{}, parent *vspk.Domain) *vspk.Zone {
+// Zone is a wrapper to create nuage zone in a declaritive way
+func Zone(zoneCfg map[string]interface{}, parent *vspk.Domain) *vspk.Zone {
 	zones, err := parent.Zones(&bambou.FetchingInfo{
 		Filter: zoneCfg["Name"].(string)})
 	handleError(err, "READ", "Zone")
@@ -110,8 +110,8 @@ func NuageZone(zoneCfg map[string]interface{}, parent *vspk.Domain) *vspk.Zone {
 	return zone
 }
 
-// NuageSubnet is a wrapper to create nuage subnet in a declaritive way
-func NuageSubnet(subnetCfg map[string]interface{}, parent *vspk.Zone) *vspk.Subnet {
+// Subnet is a wrapper to create nuage subnet in a declaritive way
+func Subnet(subnetCfg map[string]interface{}, parent *vspk.Zone) *vspk.Subnet {
 	subnets, err := parent.Subnets(&bambou.FetchingInfo{
 		Filter: subnetCfg["Name"].(string)})
 	handleError(err, "READ", "Subnet")
@@ -143,8 +143,8 @@ func NuageSubnet(subnetCfg map[string]interface{}, parent *vspk.Zone) *vspk.Subn
 	return subnet
 }
 
-// NuageBGPNeighbor is a wrapper to create nuage subnet bgp neighbor in a declaritive way
-func NuageBGPNeighbor(bgpNeighborCfg map[string]interface{}, parent *vspk.Subnet) *vspk.BGPNeighbor {
+// BGPNeighbor is a wrapper to create nuage subnet bgp neighbor in a declaritive way
+func BGPNeighbor(bgpNeighborCfg map[string]interface{}, parent *vspk.Subnet) *vspk.BGPNeighbor {
 	bgpNeighbors, err := parent.BGPNeighbors(&bambou.FetchingInfo{
 		Filter: bgpNeighborCfg["Name"].(string)})
 	handleError(err, "READ", "Subnet")
@@ -176,8 +176,8 @@ func NuageBGPNeighbor(bgpNeighborCfg map[string]interface{}, parent *vspk.Subnet
 	return bgpNeighbor
 }
 
-// NuageStaticRoute is a wrapper to create nuage domain static route in a declaritive way
-func NuageStaticRoute(staticRouteCfg map[string]interface{}, parent *vspk.Domain) *vspk.StaticRoute {
+// StaticRoute is a wrapper to create nuage domain static route in a declaritive way
+func StaticRoute(staticRouteCfg map[string]interface{}, parent *vspk.Domain) *vspk.StaticRoute {
 	staticRoutes, err := parent.StaticRoutes(&bambou.FetchingInfo{
 		Filter: staticRouteCfg["Address"].(string)})
 	handleError(err, "READ", "staticRoute")
@@ -214,8 +214,8 @@ func NuageStaticRoute(staticRouteCfg map[string]interface{}, parent *vspk.Domain
 	return staticRoute
 }
 
-// NuageIngressACLTemplate is a wrapper to create nuage domain ingress ACL Template in a declaritive way
-func NuageIngressACLTemplate(ingressACLTemplateCfg map[string]interface{}, parent *vspk.Domain) *vspk.IngressACLTemplate {
+// IngressACLTemplate is a wrapper to create nuage domain ingress ACL Template in a declaritive way
+func IngressACLTemplate(ingressACLTemplateCfg map[string]interface{}, parent *vspk.Domain) *vspk.IngressACLTemplate {
 	ingressACLTemplates, err := parent.IngressACLTemplates(&bambou.FetchingInfo{
 		Filter: ingressACLTemplateCfg["Name"].(string)})
 	handleError(err, "READ", "ingressACLTemplate")
@@ -247,8 +247,8 @@ func NuageIngressACLTemplate(ingressACLTemplateCfg map[string]interface{}, paren
 	return ingressACLTemplate
 }
 
-// NuageEgressACLTemplate is a wrapper to create nuage domain egress ACL Template in a declaritive way
-func NuageEgressACLTemplate(egressACLTemplateCfg map[string]interface{}, parent *vspk.Domain) *vspk.EgressACLTemplate {
+// EgressACLTemplate is a wrapper to create nuage domain egress ACL Template in a declaritive way
+func EgressACLTemplate(egressACLTemplateCfg map[string]interface{}, parent *vspk.Domain) *vspk.EgressACLTemplate {
 	egressACLTemplates, err := parent.EgressACLTemplates(&bambou.FetchingInfo{
 		Filter: egressACLTemplateCfg["Name"].(string)})
 	handleError(err, "READ", "egressACLTemplate")

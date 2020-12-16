@@ -7,9 +7,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// NuageCreateIKEPSK is a wrapper to create a IKE PSK in a declaritive way
-func NuageCreateIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEPSK {
-	//create PSK
+// CreateIKEPSK is a wrapper to create a IKE PSK in a declaritive way
+func CreateIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEPSK {
+	log.Infof("CreateIKEPSK started")
 
 	ikePSK := &vspk.IKEPSK{}
 
@@ -41,12 +41,37 @@ func NuageCreateIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise
 
 		log.Infof("IKE PSK created")
 	}
-	log.Infof("%#v \n", ikePSK)
+	log.Debugf("%#v \n", ikePSK)
+	log.Infof("CreateIKEPSK finished")
 	return ikePSK
 }
 
-// NuageCreateIKEGateway is a wrapper to create a IKE GW in a declaritive way
-func NuageCreateIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEGateway {
+// DeleteIKEPSK is a wrapper to delete a IKE PSK in a declaritive way
+func DeleteIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEPSK {
+	log.Infof("DeleteIKEPSK started")
+
+	ikePSK := &vspk.IKEPSK{}
+
+	ikePSKs, err := parent.IKEPSKs(&bambou.FetchingInfo{
+		Filter: ikePSKCfg["Name"].(string)})
+	handleError(err, "IKE PSK", "READ")
+
+	// init the ikePSK struct that will hold either the received object
+	// or will be created from the ikePSKCfg
+	if ikePSKs != nil {
+		log.Infof("IKE PSK already exists")
+
+		ikePSK = ikePSKs[0]
+		ikePSK.Delete()
+
+	} 
+	log.Infof("DeleteIKEPSK finished")
+	return ikePSK
+}
+
+// CreateIKEGateway is a wrapper to create a IKE GW in a declaritive way
+func CreateIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEGateway {
+	log.Infof("CreateIKEGateway started")
 	ikeGateways, err := parent.IKEGateways(&bambou.FetchingInfo{
 		Filter: ikeGatewayCfg["Name"].(string)})
 	handleError(err, "READ", "IKE Gateway")
@@ -82,12 +107,36 @@ func NuageCreateIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.En
 		handleError(ikeSubnetErr, "CREATE", "IKE Subnet")
 		log.Infof("IKE Subnet created: %s\n", ikeSubnet)
 	}
-	log.Infof("%#v \n", ikeGateway)
+	log.Debugf("%#v \n", ikeGateway)
+	log.Infof("CreateIKEGateway finished")
 	return ikeGateway
 }
 
-// NuageCreateIKEEncryptionProfile is a wrapper to create a IKE Encryption Profile in a declaritive way
-func NuageCreateIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEEncryptionprofile {
+// DeleteIKEGateway is a wrapper to delete a IKE GW in a declaritive way
+func DeleteIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.Enterprise) error {
+	log.Infof("DeleteIKEGateway started")
+	
+	ikeGateways, err := parent.IKEGateways(&bambou.FetchingInfo{
+		Filter: ikeGatewayCfg["Name"].(string)})
+	handleError(err, "READ", "IKE Gateway")
+
+	// init the ikeGateway struct that will hold either the received object
+	// or will be created from the ikeGatewayCfg
+	ikeGateway := &vspk.IKEGateway{}
+
+	if ikeGateways != nil {
+		log.Infof("IKE Gateway already exists")
+
+		ikeGateway = ikeGateways[0]
+		ikeGateway.Delete()
+	} 
+	log.Infof("DeleteIKEGateway finished")
+	return ikeGateway
+}
+
+// CreateIKEEncryptionProfile is a wrapper to create a IKE Encryption Profile in a declaritive way
+func CreateIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEEncryptionprofile {
+	log.Infof("CreateIKEEncryptionProfile started")
 	ikeEncryptionProfiles, err := parent.IKEEncryptionprofiles(&bambou.FetchingInfo{
 		Filter: ikeEncryptionProfileCfg["Name"].(string)})
 	handleError(err, "READ", "IKE Encryption Profile")
@@ -117,12 +166,36 @@ func NuageCreateIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interfac
 
 		log.Infof("IKE IKE Encryption Profile created")
 	}
-	log.Infof("%#v \n", ikeEncryptionProfile)
+	log.Debugf("%#v \n", ikeEncryptionProfile)
+	log.Infof("CreateIKEEncryptionProfile finished")
 	return ikeEncryptionProfile
 }
 
-// NuageCreateIKEGatewayProfile is a wrapper to create a IKE GW Profile in a declaritive way
-func NuageCreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEGatewayProfile {
+// DeleteIKEEncryptionProfile is a wrapper to delete a IKE Encryption Profile in a declaritive way
+func DeleteIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interface{}, parent *vspk.Enterprise) error {
+	log.Infof("DeleteIKEEncryptionProfile started")
+
+	ikeEncryptionProfiles, err := parent.IKEEncryptionprofiles(&bambou.FetchingInfo{
+		Filter: ikeEncryptionProfileCfg["Name"].(string)})
+	handleError(err, "READ", "IKE Encryption Profile")
+
+	// init the IKEEncryptionprofile struct that will hold either the received object
+	// or will be created from the IKEEncryptionprofileCfg
+	ikeEncryptionProfile := &vspk.IKEEncryptionprofile{}
+
+	if ikeEncryptionProfiles != nil {
+		log.Infof("IKE Encryption Profile already exists")
+
+		ikeEncryptionProfile = ikeEncryptionProfiles[0]
+		ikeEncryptionProfile.Delete()
+	} 
+	log.Infof("DeleteIKEEncryptionProfile finished")
+	return ikeEncryptionProfile
+}
+
+// CreateIKEGatewayProfile is a wrapper to create a IKE GW Profile in a declaritive way
+func CreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEGatewayProfile {
+	log.Infof("CreateIKEGatewayProfile started")
 	ikeGatewayProfiles, err := parent.IKEGatewayProfiles(&bambou.FetchingInfo{
 		Filter: ikeGatewayProfileCfg["Name"].(string)})
 	handleError(err, "READ", "IKE Gateway Profile")
@@ -153,12 +226,35 @@ func NuageCreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, p
 		log.Infof("IKE Gateway Profile1 created")
 	}
 
-	log.Infof("%#v \n", ikeGatewayProfile)
+	log.Debugf("%#v \n", ikeGatewayProfile)
+	log.Infof("CreateIKEGatewayProfile finished")
 	return ikeGatewayProfile
 }
 
-// NuageCreateIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
-func NuageCreateIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.IKEGatewayConnection {
+// DeleteIKEGatewayProfile is a wrapper to delete a IKE GW Profile in a declaritive way
+func DeleteIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, parent *vspk.VLAN) error {
+	log.Infof("DeleteIKEGatewayProfile started")
+
+	ikeGatewayProfiles, err := parent.IKEGatewayProfiles(&bambou.FetchingInfo{
+		Filter: ikeGatewayProfileCfg["Name"].(string)})
+	handleError(err, "READ", "IKE Gateway Profile")
+
+	// init the ikeGatewayProfile struct that will hold either the received object
+	// or will be created from the ikeGatewayProfileCfg
+	ikeGatewayProfile := &vspk.IKEGatewayProfile{}
+
+	if ikeGatewayProfiles != nil {
+		log.Infof("IKE Gateway Profile already exists")
+
+		ikeGatewayProfile = ikeGatewayProfiles[0]
+		ikeGatewayProfile.Delete()
+	}
+	log.Infof("DeleteIKEGatewayProfile finished")
+	return nil
+}
+
+// CreateIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
+func CreateIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.IKEGatewayConnection {
 	log.Infof("NuageCreateIKEGatewayConnection started")
 
 	ikeGatewayConns, err := parent.IKEGatewayConnections(&bambou.FetchingInfo{
@@ -190,14 +286,14 @@ func NuageCreateIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, p
 		log.Infof("IKE GW Connection created")
 	}
 
-	log.Infof("%#v \n", ikeGatewayConn)
+	log.Debugf("%#v \n", ikeGatewayConn)
 	log.Infof("NuageCreateIKEGatewayConnection finished")
 	return ikeGatewayConn
 }
 
-// NuageDeleteIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
-func NuageDeleteIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) error {
-	log.Println("NuageDeleteIKEGatewayConnection started")
+// DeleteIKEGatewayConnection is a wrapper to create a IKE GW Connection in a declaritive way
+func DeleteIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, parent *vspk.VLAN) error {
+	log.Infof("NuageDeleteIKEGatewayConnection started")
 
 	ikeGatewayConns, err := parent.IKEGatewayConnections(&bambou.FetchingInfo{
 		Filter: ikeGatewayConnCfg["Name"].(string)})
@@ -212,7 +308,7 @@ func NuageDeleteIKEGatewayConnection(ikeGatewayConnCfg map[string]interface{}, p
 		ikeGatewayConn = ikeGatewayConns[0]
 		ikeGatewayConn.Delete()
 	}
-	log.Infof("%#v \n", ikeGatewayConn)
+	log.Debugf("%#v \n", ikeGatewayConn)
 	log.Infof("NuageIKEGatewayConnection finished")
 	return nil
 }

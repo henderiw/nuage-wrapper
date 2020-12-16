@@ -7,8 +7,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// NuageRateLimiter is a wrapper to create a Rate Limiter in a declaritive way
-func NuageRateLimiter(rateLimiterCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.RateLimiter {
+// RateLimiter is a wrapper to create a Rate Limiter in a declaritive way
+func RateLimiter(rateLimiterCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.RateLimiter {
 
 	rateLimiters, err := parent.RateLimiters(&bambou.FetchingInfo{
 		Filter: rateLimiterCfg["Name"].(string)})
@@ -44,8 +44,8 @@ func NuageRateLimiter(rateLimiterCfg map[string]interface{}, parent *vspk.Enterp
 	return rateLimiter
 }
 
-// NuageEgressQoSPolicy is a wrapper to create a QoS Policy in a declaritive way
-func NuageEgressQoSPolicy(egressQoSPolicyCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.EgressQOSPolicy {
+// EgressQoSPolicy is a wrapper to create a QoS Policy in a declaritive way
+func EgressQoSPolicy(egressQoSPolicyCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.EgressQOSPolicy {
 
 	egressQoSPolicies, err := parent.EgressQOSPolicies(&bambou.FetchingInfo{
 		Filter: egressQoSPolicyCfg["Name"].(string)})
@@ -81,8 +81,8 @@ func NuageEgressQoSPolicy(egressQoSPolicyCfg map[string]interface{}, parent *vsp
 	return egressQoSPolicy
 }
 
-// NuageCOSRemarkingPolicy is a wrapper to create a COS remarking Policy in a declaritive way
-func NuageCOSRemarkingPolicy(cosRemarkingPolicyCfg map[string]interface{}, parent *vspk.COSRemarkingPolicyTable) *vspk.COSRemarkingPolicy {
+// COSRemarkingPolicy is a wrapper to create a COS remarking Policy in a declaritive way
+func COSRemarkingPolicy(cosRemarkingPolicyCfg map[string]interface{}, parent *vspk.COSRemarkingPolicyTable) *vspk.COSRemarkingPolicy {
 
 	cosRemarkingPolicies, err := parent.COSRemarkingPolicies(&bambou.FetchingInfo{
 		Filter: cosRemarkingPolicyCfg["DSCP"].(string)})
@@ -113,8 +113,8 @@ func NuageCOSRemarkingPolicy(cosRemarkingPolicyCfg map[string]interface{}, paren
 	return cosRemarkingPolicy
 }
 
-// NuageCOSRemarkingPolicyTable is a wrapper to create a COS remarking Policy in a declaritive way
-func NuageCOSRemarkingPolicyTable(cosRemarkingPolicyTableCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.COSRemarkingPolicyTable {
+// COSRemarkingPolicyTable is a wrapper to create a COS remarking Policy in a declaritive way
+func COSRemarkingPolicyTable(cosRemarkingPolicyTableCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.COSRemarkingPolicyTable {
 
 	cosRemarkingPolicyTables, err := parent.COSRemarkingPolicyTables(&bambou.FetchingInfo{
 		Filter: cosRemarkingPolicyTableCfg["Name"].(string)})
@@ -151,8 +151,8 @@ func NuageCOSRemarkingPolicyTable(cosRemarkingPolicyTableCfg map[string]interfac
 	return cosRemarkingPolicyTable
 }
 
-// NuageDSCPRemarkingPolicy is a wrapper to create a DSCP remarking Policy in a declaritive way
-func NuageDSCPRemarkingPolicy(dscpRemarkingPolicyCfg map[string]interface{}, parent *vspk.DSCPRemarkingPolicyTable) *vspk.DSCPRemarkingPolicy {
+// DSCPRemarkingPolicy is a wrapper to create a DSCP remarking Policy in a declaritive way
+func DSCPRemarkingPolicy(dscpRemarkingPolicyCfg map[string]interface{}, parent *vspk.DSCPRemarkingPolicyTable) *vspk.DSCPRemarkingPolicy {
 
 	dscpRemarkingPolicies, err := parent.DSCPRemarkingPolicies(&bambou.FetchingInfo{
 		Filter: dscpRemarkingPolicyCfg["DSCP"].(string)})
@@ -183,8 +183,8 @@ func NuageDSCPRemarkingPolicy(dscpRemarkingPolicyCfg map[string]interface{}, par
 	return dscpRemarkingPolicy
 }
 
-// NuageDSCPRemarkingPolicyTable is a wrapper to create a DSCP remarking Policy in a declaritive way
-func NuageDSCPRemarkingPolicyTable(dscpRemarkingPolicyTableCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.DSCPRemarkingPolicyTable {
+// DSCPRemarkingPolicyTable is a wrapper to create a DSCP remarking Policy in a declaritive way
+func DSCPRemarkingPolicyTable(dscpRemarkingPolicyTableCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.DSCPRemarkingPolicyTable {
 
 	dscpRemarkingPolicyTables, err := parent.DSCPRemarkingPolicyTables(&bambou.FetchingInfo{
 		Filter: dscpRemarkingPolicyTableCfg["Name"].(string)})

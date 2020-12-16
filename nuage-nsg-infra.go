@@ -7,8 +7,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// NuageInfraGwProfile is a wrapper to create nuage infrastructure GW Profile in a declaritive way
-func NuageInfraGwProfile(infraGwProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.InfrastructureGatewayProfile {
+// InfraGwProfile is a wrapper to create nuage infrastructure GW Profile in a declaritive way
+func InfraGwProfile(infraGwProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.InfrastructureGatewayProfile {
 	infraGwProfile := &vspk.InfrastructureGatewayProfile{}
 
 	infraGwProfiles, err := parent.InfrastructureGatewayProfiles(&bambou.FetchingInfo{
@@ -42,8 +42,8 @@ func NuageInfraGwProfile(infraGwProfileCfg map[string]interface{}, parent *vspk.
 	return infraGwProfile
 }
 
-// NuageNsgUpgradeProfile is a wrapper to create nuage NSG Upgrade Profile in a declaritive way
-func NuageNsgUpgradeProfile(upgradeProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGUpgradeProfile {
+// NsgUpgradeProfile is a wrapper to create nuage NSG Upgrade Profile in a declaritive way
+func NsgUpgradeProfile(upgradeProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGUpgradeProfile {
 	upgradeProfile := &vspk.NSGUpgradeProfile{}
 
 	upgradeProfiles, err := parent.NSGUpgradeProfiles(&bambou.FetchingInfo{
@@ -77,8 +77,8 @@ func NuageNsgUpgradeProfile(upgradeProfileCfg map[string]interface{}, parent *vs
 	return upgradeProfile
 }
 
-// NuageInfraAccessProfile is a wrapper to create nuage infrastructure Access Profile in a declaritive way
-func NuageInfraAccessProfile(infraAccessProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.InfrastructureAccessProfile {
+// InfraAccessProfile is a wrapper to create nuage infrastructure Access Profile in a declaritive way
+func InfraAccessProfile(infraAccessProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.InfrastructureAccessProfile {
 	infraAccessProfile := &vspk.InfrastructureAccessProfile{}
 
 	infraAccessProfiles, err := parent.InfrastructureAccessProfiles(&bambou.FetchingInfo{
@@ -112,8 +112,8 @@ func NuageInfraAccessProfile(infraAccessProfileCfg map[string]interface{}, paren
 	return infraAccessProfile
 }
 
-// NuageInfraVscProfile is a wrapper to create nuage infrastructure VSC Profile in a declaritive way
-func NuageInfraVscProfile(infraVscProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.InfrastructureVscProfile {
+// InfraVscProfile is a wrapper to create nuage infrastructure VSC Profile in a declaritive way
+func InfraVscProfile(infraVscProfileCfg map[string]interface{}, parent *vspk.Me) *vspk.InfrastructureVscProfile {
 	infraVscProfile := &vspk.InfrastructureVscProfile{}
 
 	infraVscProfiles, err := parent.InfrastructureVscProfiles(&bambou.FetchingInfo{
@@ -147,8 +147,8 @@ func NuageInfraVscProfile(infraVscProfileCfg map[string]interface{}, parent *vsp
 	return infraVscProfile
 }
 
-// NuageDucGroup is a wrapper to create nuage DUC Group in a declaritive way
-func NuageDucGroup(ducGroupCfg map[string]interface{}, parent *vspk.Me) *vspk.DUCGroup {
+// DucGroup is a wrapper to create nuage DUC Group in a declaritive way
+func DucGroup(ducGroupCfg map[string]interface{}, parent *vspk.Me) *vspk.DUCGroup {
 	ducGroup := &vspk.DUCGroup{}
 
 	ducGroups, err := parent.DUCGroups(&bambou.FetchingInfo{
@@ -182,8 +182,8 @@ func NuageDucGroup(ducGroupCfg map[string]interface{}, parent *vspk.Me) *vspk.DU
 	return ducGroup
 }
 
-// NuagePerfMonitor is a wrapper to create nuage Performance Monitor in a declaritive way
-func NuagePerfMonitor(perfMonitorCfg map[string]interface{}, parent *vspk.Me) *vspk.PerformanceMonitor {
+// PerfMonitor is a wrapper to create nuage Performance Monitor in a declaritive way
+func PerfMonitor(perfMonitorCfg map[string]interface{}, parent *vspk.Me) *vspk.PerformanceMonitor {
 	perfMonitor := &vspk.PerformanceMonitor{}
 
 	perfMonitors, err := parent.PerformanceMonitors(&bambou.FetchingInfo{
@@ -217,8 +217,8 @@ func NuagePerfMonitor(perfMonitorCfg map[string]interface{}, parent *vspk.Me) *v
 	return perfMonitor
 }
 
-// NuageUnderlay is a wrapper to create nuage underlay in a declaritive way
-func NuageUnderlay(underlayCfg map[string]interface{}, parent *vspk.Me) *vspk.Underlay {
+// Underlay is a wrapper to create nuage underlay in a declaritive way
+func Underlay(underlayCfg map[string]interface{}, parent *vspk.Me) *vspk.Underlay {
 	underlay := &vspk.Underlay{}
 
 	underlays, err := parent.Underlays(&bambou.FetchingInfo{
@@ -252,8 +252,8 @@ func NuageUnderlay(underlayCfg map[string]interface{}, parent *vspk.Me) *vspk.Un
 	return underlay
 }
 
-// NuageInfraNsgGroup is a wrapper to create nuage NSG Group in a declaritive way
-func NuageInfraNsgGroup(nsgGroupCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGGroup {
+// InfraNsgGroup is a wrapper to create nuage NSG Group in a declaritive way
+func InfraNsgGroup(nsgGroupCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGGroup {
 	nsgGroup := &vspk.NSGGroup{}
 
 	nsgGroups, err := parent.NSGGroups(&bambou.FetchingInfo{
@@ -287,8 +287,8 @@ func NuageInfraNsgGroup(nsgGroupCfg map[string]interface{}, parent *vspk.Me) *vs
 	return nsgGroup
 }
 
-// NuageNsgGroup is a wrapper to create nuage NSG Group in a declaritive way
-func NuageNsgGroup(nsgGroupCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSGGroup {
+// NsgGroup is a wrapper to create nuage NSG Group in a declaritive way
+func NsgGroup(nsgGroupCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSGGroup {
 	nsgGroup := &vspk.NSGGroup{}
 
 	nsgGroups, err := parent.NSGGroups(&bambou.FetchingInfo{

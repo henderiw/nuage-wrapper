@@ -63,15 +63,15 @@ type NuageNSGCfg struct {
 	} `json:"WifiPorts"`
 }
 
-// NuageCreateEntireNSG is a wrapper to create a complete NSG in a declaritive way
-func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk.Me) *vspk.NSGateway {
+// CreateEntireNSG is a wrapper to create a complete NSG in a declaritive way
+func CreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk.Me) *vspk.NSGateway {
 
 	nsGatewayTemplateCfg := map[string]interface{}{
 		"Name": nsgCfg.NSGTemplateName,
 	}
 	//log.Infof("NSG Template ID: %s \n", nsgCfg.NSGTemplateID)
 
-	nsGatewayTemplate := NuageNSGatewayTemplate(nsGatewayTemplateCfg, Usr)
+	nsGatewayTemplate := NSGatewayTemplate(nsGatewayTemplateCfg, Usr)
 	nsgCfg.NSGTemplateID = nsGatewayTemplate.ID
 	//flog.Infof("NSG Template ID: %s \n", nsgCfg.NSGTemplateID)
 
@@ -106,9 +106,9 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 
 	var nsGateway *vspk.NSGateway
 	if nsGatewayTemplate.Personality == "NSGDUC" || nsGatewayTemplate.Personality == "NSGBR" {
-		nsGateway = NuageNSGRoot(nsGatewayCfg, Usr)
+		nsGateway = NSGRoot(nsGatewayCfg, Usr)
 	} else {
-		nsGateway = NuageNSG(nsGatewayCfg, parent)
+		nsGateway = NSG(nsGatewayCfg, parent)
 	}
 
 	//time.Sleep(15 * time.Second)
@@ -124,7 +124,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			"EnableNATProbes": true,
 			"NATTraversal":    "FULL_NAT",
 		}
-		nsPort := NuageNSGPort(nsPortCfg, nsGateway)
+		nsPort := NSGPort(nsPortCfg, nsGateway)
 
 		log.Infof("Port: %#v \n", nsPort)
 
@@ -134,7 +134,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				vscProfCfg := map[string]interface{}{
 					"Name": vlan.VscName,
 				}
-				vscProf := NuageInfraVscProfile(vscProfCfg, Usr)
+				vscProf := InfraVscProfile(vscProfCfg, Usr)
 				vlan.VscID = vscProf.ID
 
 				//log.Infof("VSC NEEDED for vlan: %s with VSC ID: %s", vlan.VlanID, vlan.VscID)
@@ -166,7 +166,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			}
 
 			log.Infof("VLANCfg: %#v \n", nsVlanCfg)
-			nsVlan := NuageVlan(nsVlanCfg, nsPort)
+			nsVlan := Vlan(nsVlanCfg, nsPort)
 			log.Infof("Port: %#v \n", nsVlan)
 
 			var patEnabled = true
@@ -203,7 +203,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				underlayCfg := map[string]interface{}{
 					"Name": vlan.UnderlayName,
 				}
-				underlay := NuageUnderlay(underlayCfg, Usr)
+				underlay := Underlay(underlayCfg, Usr)
 				log.Infof("Underlay: %v", underlay)
 				vlan.UnderlayID = underlay.ID
 
@@ -260,7 +260,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 
 			//log.Infof(uplinkConnectionCfg)
 
-			uplinkConn := NuageUplinkConnection(uplinkConnectionCfg, nsVlan)
+			uplinkConn := UplinkConnection(uplinkConnectionCfg, nsVlan)
 
 			if strings.Contains(port.Name, "lte") {
 				log.Infof("LTE")
@@ -270,21 +270,21 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 					"AttributeValue": vlan.LteConfiguration.Apn,
 				}
 
-				NuageCustomProperty(customePropCfg, uplinkConn)
+				CustomProperty(customePropCfg, uplinkConn)
 
 				customePropCfg = map[string]interface{}{
 					"AttributeName":  "pdp-type",
 					"AttributeValue": vlan.LteConfiguration.PdpType,
 				}
 
-				NuageCustomProperty(customePropCfg, uplinkConn)
+				CustomProperty(customePropCfg, uplinkConn)
 
 				customePropCfg = map[string]interface{}{
 					"AttributeName":  "sim-pin",
 					"AttributeValue": vlan.LteConfiguration.PinCode,
 				}
 
-				NuageCustomProperty(customePropCfg, uplinkConn)
+				CustomProperty(customePropCfg, uplinkConn)
 
 				if vlan.LteConfiguration.Authentication != "" {
 					customePropCfg = map[string]interface{}{
@@ -292,7 +292,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 						"AttributeValue": vlan.LteConfiguration.Authentication,
 					}
 
-					NuageCustomProperty(customePropCfg, uplinkConn)
+					CustomProperty(customePropCfg, uplinkConn)
 				}
 
 				if vlan.LteConfiguration.UserName != "" {
@@ -301,7 +301,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 						"AttributeValue": vlan.LteConfiguration.UserName,
 					}
 
-					NuageCustomProperty(customePropCfg, uplinkConn)
+					CustomProperty(customePropCfg, uplinkConn)
 				}
 
 				if vlan.LteConfiguration.PassWord != "" {
@@ -310,7 +310,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 						"AttributeValue": vlan.LteConfiguration.PassWord,
 					}
 
-					NuageCustomProperty(customePropCfg, uplinkConn)
+					CustomProperty(customePropCfg, uplinkConn)
 				}
 
 			} else {
@@ -331,7 +331,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			"NATTraversal":    "FULL_NAT",
 			"Mtu":             2000,
 		}
-		nsPort := NuageNSGPort(nsPortCfg, nsGateway)
+		nsPort := NSGPort(nsPortCfg, nsGateway)
 
 		for _, vlan := range port.Vlan {
 			nsVlanCfg := map[string]interface{}{
@@ -342,7 +342,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			}
 
 			log.Infof("VLANCfg: %s \n", nsVlanCfg)
-			nsVlan := NuageVlan(nsVlanCfg, nsPort)
+			nsVlan := Vlan(nsVlanCfg, nsPort)
 			//log.Infof(nsVlan)
 
 			uplinkConnCfg := map[string]interface{}{
@@ -361,7 +361,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 				//"UnderlayID":      port.UnderlayID,
 			}
 
-			uplinkConn := NuageUplinkConnection(uplinkConnCfg, nsVlan)
+			uplinkConn := UplinkConnection(uplinkConnCfg, nsVlan)
 			//log.Infof(uplinkConn)
 		}
 
@@ -375,14 +375,14 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			"PortType":     "ACCESS",
 			"VLANRange":    "0-4094",
 		}
-		nsPort := NuageNSGPort(nsPortCfg, nsGateway)
+		nsPort := NSGPort(nsPortCfg, nsGateway)
 
 		for _, vlan := range port.Vlan {
 			nsVlanCfg := map[string]interface{}{
 				"Value": vlan.VlanID,
 			}
 			log.Infof("Access VLANCfg: %#v \n", nsVlanCfg)
-			nsVlan := NuageVlan(nsVlanCfg, nsPort)
+			nsVlan := Vlan(nsVlanCfg, nsPort)
 			//log.Infof(nsVlan)
 		}
 
@@ -396,7 +396,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			"WifiMode":          "WIFI_B_G_N",
 			"CountryCode":       "BE",
 		}
-		nsPort := NuageNSGWirelessPort(nsPortCfg, nsGateway)
+		nsPort := NSGWirelessPort(nsPortCfg, nsGateway)
 
 		ssidConnCfg := map[string]interface{}{
 			"Name":               port.Ssid,
@@ -404,7 +404,7 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 			"AuthenticationMode": "WPA2",
 			"BroadcastSSID":      true,
 		}
-		ssidConn := NuageSSIDConnection(ssidConnCfg, nsPort)
+		ssidConn := SSIDConnection(ssidConnCfg, nsPort)
 		//log.Infof(ssidConn)
 	}
 
@@ -412,8 +412,8 @@ func NuageCreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk
 	return nsGateway
 }
 
-// NuageNSGatewayTemplate is a wrapper to create nuage NS Gateway template in a declaritive way
-func NuageNSGatewayTemplate(nsGatewayTemplateCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGatewayTemplate {
+// NSGatewayTemplate is a wrapper to create nuage NS Gateway template in a declaritive way
+func NSGatewayTemplate(nsGatewayTemplateCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGatewayTemplate {
 
 	nsGatewayTemplate := &vspk.NSGatewayTemplate{}
 
@@ -448,8 +448,8 @@ func NuageNSGatewayTemplate(nsGatewayTemplateCfg map[string]interface{}, parent 
 	return nsGatewayTemplate
 }
 
-// NuageNSGRoot is a wrapper to create nuage NS Gateway in a declaritive way
-func NuageNSGRoot(nsGatewayCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGateway {
+// NSGRoot is a wrapper to create nuage NS Gateway in a declaritive way
+func NSGRoot(nsGatewayCfg map[string]interface{}, parent *vspk.Me) *vspk.NSGateway {
 
 	nsGateways, err := parent.NSGateways(&bambou.FetchingInfo{
 		Filter: nsGatewayCfg["Name"].(string)})
@@ -487,8 +487,8 @@ func NuageNSGRoot(nsGatewayCfg map[string]interface{}, parent *vspk.Me) *vspk.NS
 	return nsGateway
 }
 
-// NuageNSG is a wrapper to create nuage NS Gateway in a declaritive way
-func NuageNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSGateway {
+// NSG is a wrapper to create nuage NS Gateway in a declaritive way
+func NSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSGateway {
 	nsGateways, err := parent.NSGateways(&bambou.FetchingInfo{
 		Filter: nsGatewayCfg["Name"].(string)})
 	handleError(err, "READ", "NS Gateway")
@@ -522,8 +522,50 @@ func NuageNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vsp
 	return nsGateway
 }
 
-// NuageNSGRedundantGwGroup is a wrapper to create nuage NS Gateway redundant Group in a declaritive way
-func NuageNSGRedundantGwGroup(nsRedundantGwGroupCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSRedundantGatewayGroup {
+// GetNSG is a wrapper to get nuage NS Gateway in a declaritive way
+func GetNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSGateway {
+	nsGateways, err := parent.NSGateways(&bambou.FetchingInfo{
+		Filter: nsGatewayCfg["Name"].(string)})
+	handleError(err, "READ", "NS Gateway")
+
+	// init the nsGateway struct that will hold either the received object
+	// or will be created from the nsGatewayCfg
+	nsGateway := &vspk.NSGateway{}
+
+	if nsGateways == nil {
+		log.Infof("NS Gateway does not exists")
+
+		
+		return nil
+	} 
+	nsGateway = nsGateways[0]
+	return nsGateway
+}
+
+// DeleteNSG is a wrapper to delete nuage NS Gateway in a declaritive way
+func DeleteNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) error {
+	log.Infof("DeleteNSG started")
+
+	nsGateways, err := parent.NSGateways(&bambou.FetchingInfo{
+		Filter: nsGatewayCfg["Name"].(string)})
+	handleError(err, "READ", "NS Gateway")
+
+	// init the nsGateway struct that will hold either the received object
+	// or will be created from the nsGatewayCfg
+	nsGateway := &vspk.NSGateway{}
+
+	if nsGateways != nil {
+		log.Infof("NS Gateway already exists")
+
+		nsGateway = nsGateways[0]
+		nsGateway.Delete()
+	} 
+	log.Infof("DeleteNSG finished")
+	return nil
+}
+
+// NSGRedundantGwGroup is a wrapper to create nuage NS Gateway redundant Group in a declaritive way
+func NSGRedundantGwGroup(nsRedundantGwGroupCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.NSRedundantGatewayGroup {
 
 	nsRedundantGwGroups, err := parent.NSRedundantGatewayGroups(&bambou.FetchingInfo{
 		Filter: nsRedundantGwGroupCfg["Name"].(string)})
@@ -558,8 +600,8 @@ func NuageNSGRedundantGwGroup(nsRedundantGwGroupCfg map[string]interface{}, pare
 	return nsRedundantGwGroup
 }
 
-// NuageShuntLink is a wrapper to create a NSG shunt link in a declaritive way
-func NuageShuntLink(shuntLinkCfg map[string]interface{}, parent *vspk.NSRedundantGatewayGroup) *vspk.ShuntLink {
+// ShuntLink is a wrapper to create a NSG shunt link in a declaritive way
+func ShuntLink(shuntLinkCfg map[string]interface{}, parent *vspk.NSRedundantGatewayGroup) *vspk.ShuntLink {
 
 	shuntLinks, err := parent.ShuntLinks(&bambou.FetchingInfo{
 		Filter: shuntLinkCfg["Name"].(string)})
@@ -598,8 +640,8 @@ func NuageShuntLink(shuntLinkCfg map[string]interface{}, parent *vspk.NSRedundan
 	return shuntLink
 }
 
-// NuageNSGRedundantPort is a wrapper to create a NSG redundant Port in a declaritive way
-func NuageNSGRedundantPort(nsRedundantPortCfg map[string]interface{}, parent *vspk.NSRedundantGatewayGroup) *vspk.RedundantPort {
+// NSGRedundantPort is a wrapper to create a NSG redundant Port in a declaritive way
+func NSGRedundantPort(nsRedundantPortCfg map[string]interface{}, parent *vspk.NSRedundantGatewayGroup) *vspk.RedundantPort {
 
 	nsRedundantPorts, err := parent.RedundantPorts(&bambou.FetchingInfo{
 		Filter: nsRedundantPortCfg["Name"].(string)})
@@ -636,8 +678,8 @@ func NuageNSGRedundantPort(nsRedundantPortCfg map[string]interface{}, parent *vs
 	return nsRedundantPort
 }
 
-// NuageNSGPort is a wrapper to create a NSG Port in a declaritive way
-func NuageNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.NSPort {
+// NSGPort is a wrapper to create a NSG Port in a declaritive way
+func NSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.NSPort {
 
 	nsPorts, err := parent.NSPorts(&bambou.FetchingInfo{
 		Filter: nsPortCfg["Name"].(string)})
@@ -673,8 +715,50 @@ func NuageNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vsp
 	return nsPort
 }
 
-// NuageNSGWirelessPort is a wrapper to create a NSG Wireless Port in a declaritive way
-func NuageNSGWirelessPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.WirelessPort {
+// DeleteNSGPort is a wrapper to create a NSG Port in a declaritive way
+func DeleteNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) error {
+	log.Infof("DeleteNSGPort started")
+	nsPorts, err := parent.NSPorts(&bambou.FetchingInfo{
+		Filter: nsPortCfg["Name"].(string)})
+	handleError(err, "READ", "NSG Port")
+
+	// init the nsPort struct that will hold either the received object
+	// or will be created from the nsPortCfg
+	nsPort := &vspk.NSPort{}
+
+	if nsPorts != nil {
+		log.Infof("NS Port already exists")
+
+		nsPort = nsPorts[0]
+		nsPort.Delete()
+	} 
+
+	log.Infof("DeleteNSGPort finished")
+	return nil
+}
+
+// GetNSGPort is a wrapper to create a NSG Port in a declaritive way
+func GetNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.NSPort {
+
+	nsPorts, err := parent.NSPorts(&bambou.FetchingInfo{
+		Filter: nsPortCfg["Name"].(string)})
+	handleError(err, "READ", "NSG Port")
+
+	// init the nsPort struct that will hold either the received object
+	// or will be created from the nsPortCfg
+	nsPort := &vspk.NSPort{}
+
+	if nsPorts == nil {
+		log.Infof("NS Port does not exists")
+		return nil
+	} 
+
+	nsPort = nsPorts[0]
+	return nsPort
+}
+
+// NSGWirelessPort is a wrapper to create a NSG Wireless Port in a declaritive way
+func NSGWirelessPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.WirelessPort {
 
 	nsPorts, err := parent.WirelessPorts(&bambou.FetchingInfo{
 		Filter: nsPortCfg["Name"].(string)})
@@ -709,8 +793,8 @@ func NuageNSGWirelessPort(nsPortCfg map[string]interface{}, parent *vspk.NSGatew
 	return nsPort
 }
 
-// NuageredundantVlan is a wrapper to create a NSG VLAN in a declaritive way
-func NuageredundantVlan(nsVlanCfg map[string]interface{}, parent *vspk.RedundantPort) *vspk.VLAN {
+// RedundantVlan is a wrapper to create a NSG VLAN in a declaritive way
+func RedundantVlan(nsVlanCfg map[string]interface{}, parent *vspk.RedundantPort) *vspk.VLAN {
 
 	log.Infof("VLAN Cfg: %#v \n", nsVlanCfg)
 	nsVlans, err := parent.VLANs(&bambou.FetchingInfo{
@@ -753,8 +837,8 @@ func NuageredundantVlan(nsVlanCfg map[string]interface{}, parent *vspk.Redundant
 	return nsVlan
 }
 
-// NuageVlan is a wrapper to create a NSG VLAN in a declaritive way
-func NuageVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN {
+// Vlan is a wrapper to create a NSG VLAN in a declaritive way
+func Vlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN {
 
 	log.Infof("VLAN Cfg: %#v \n", nsVlanCfg)
 	nsVlans, err := parent.VLANs(&bambou.FetchingInfo{
@@ -797,8 +881,55 @@ func NuageVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN
 	return nsVlan
 }
 
-// NuageSSIDConnection is a wrapper to create a NSG SSID in a declaritive way
-func NuageSSIDConnection(ssidConnCfg map[string]interface{}, parent *vspk.WirelessPort) *vspk.SSIDConnection {
+// DeleteVlan is a wrapper to delete a NSG VLAN in a declaritive way
+func DeleteVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) error {
+	log.Infof("DeleteVlan started")
+	log.Debugf("VLAN Cfg: %#v \n", nsVlanCfg)
+	nsVlans, err := parent.VLANs(&bambou.FetchingInfo{
+		Filter: fmt.Sprintf("value == %d", nsVlanCfg["Value"])})
+
+	handleError(err, "READ", "NSG VLAN")
+
+	// init the nsVlan struct that will hold either the received object
+	// or will be created from the nsVlanCfg
+	nsVlan := &vspk.VLAN{}
+
+	log.Debugf("VLANs %#v \n", nsVlans)
+
+	if nsVlans != nil {
+		log.Infof("NS VLAN already exists")
+
+		nsVlan = nsVlans[0]
+		nsVlan.Delete()
+	} 
+	log.Infof("DeleteVlan finished")
+	return nil
+}
+
+// GetVlan is a wrapper to get a NSG VLAN in a declaritive way
+func GetVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN {
+	log.Infof("GetVlan started")
+	nsVlans, err := parent.VLANs(&bambou.FetchingInfo{
+		Filter: fmt.Sprintf("value == %d", nsVlanCfg["Value"])})
+	handleError(err, "READ", "NSG VLAN")
+
+	// init the nsVlan struct that will hold either the received object
+	// or will be created from the nsVlanCfg
+	nsVlan := &vspk.VLAN{}
+
+	log.Debugf("VLANs %#v \n", nsVlans)
+
+	if nsVlans == nil {
+		log.Infof("NS VLAN already exists")
+		return nil
+	} 
+
+	vlan = nsVlans[0]
+	return nsVlan
+}
+
+// SSIDConnection is a wrapper to create a NSG SSID in a declaritive way
+func SSIDConnection(ssidConnCfg map[string]interface{}, parent *vspk.WirelessPort) *vspk.SSIDConnection {
 
 	ssidConns, err := parent.SSIDConnections(&bambou.FetchingInfo{
 		Filter: ssidConnCfg["Name"].(string)})
@@ -832,8 +963,8 @@ func NuageSSIDConnection(ssidConnCfg map[string]interface{}, parent *vspk.Wirele
 	return ssidConn
 }
 
-// NuageUplinkConnection is a wrapper to create a NSG uplink connection in a declaritive way
-func NuageUplinkConnection(uplinkConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.UplinkConnection {
+// UplinkConnection is a wrapper to create a NSG uplink connection in a declaritive way
+func UplinkConnection(uplinkConnCfg map[string]interface{}, parent *vspk.VLAN) *vspk.UplinkConnection {
 
 	uplinkConns, err := parent.UplinkConnections(&bambou.FetchingInfo{})
 
@@ -870,8 +1001,8 @@ func NuageUplinkConnection(uplinkConnCfg map[string]interface{}, parent *vspk.VL
 	return uplinkConn
 }
 
-// NuageCustomProperty is a wrapper to create a NSG Custom Property on a port in a declaritive way
-func NuageCustomProperty(customePropCfg map[string]interface{}, parent *vspk.UplinkConnection) *vspk.CustomProperty {
+// CustomProperty is a wrapper to create a NSG Custom Property on a port in a declaritive way
+func CustomProperty(customePropCfg map[string]interface{}, parent *vspk.UplinkConnection) *vspk.CustomProperty {
 
 	customeProps, err := parent.CustomProperties(&bambou.FetchingInfo{
 		Filter: customePropCfg["AttributeName"].(string)})
