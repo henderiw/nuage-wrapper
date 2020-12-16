@@ -64,7 +64,7 @@ func DeleteIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vs
 		ikePSK = ikePSKs[0]
 		ikePSK.Delete()
 
-	} 
+	}
 	log.Infof("DeleteIKEPSK finished")
 	return ikePSK
 }
@@ -115,7 +115,7 @@ func CreateIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.Enterpr
 // DeleteIKEGateway is a wrapper to delete a IKE GW in a declaritive way
 func DeleteIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.Enterprise) error {
 	log.Infof("DeleteIKEGateway started")
-	
+
 	ikeGateways, err := parent.IKEGateways(&bambou.FetchingInfo{
 		Filter: ikeGatewayCfg["Name"].(string)})
 	handleError(err, "READ", "IKE Gateway")
@@ -129,9 +129,9 @@ func DeleteIKEGateway(ikeGatewayCfg map[string]interface{}, parent *vspk.Enterpr
 
 		ikeGateway = ikeGateways[0]
 		ikeGateway.Delete()
-	} 
+	}
 	log.Infof("DeleteIKEGateway finished")
-	return ikeGateway
+	return nil
 }
 
 // CreateIKEEncryptionProfile is a wrapper to create a IKE Encryption Profile in a declaritive way
@@ -188,9 +188,9 @@ func DeleteIKEEncryptionProfile(ikeEncryptionProfileCfg map[string]interface{}, 
 
 		ikeEncryptionProfile = ikeEncryptionProfiles[0]
 		ikeEncryptionProfile.Delete()
-	} 
+	}
 	log.Infof("DeleteIKEEncryptionProfile finished")
-	return ikeEncryptionProfile
+	return nil
 }
 
 // CreateIKEGatewayProfile is a wrapper to create a IKE GW Profile in a declaritive way
@@ -232,7 +232,7 @@ func CreateIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, parent
 }
 
 // DeleteIKEGatewayProfile is a wrapper to delete a IKE GW Profile in a declaritive way
-func DeleteIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, parent *vspk.VLAN) error {
+func DeleteIKEGatewayProfile(ikeGatewayProfileCfg map[string]interface{}, parent *vspk.Enterprise) error {
 	log.Infof("DeleteIKEGatewayProfile started")
 
 	ikeGatewayProfiles, err := parent.IKEGatewayProfiles(&bambou.FetchingInfo{

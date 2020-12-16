@@ -15,8 +15,8 @@ func DomainTemplate(domainTemplateCfg map[string]interface{}, parent *vspk.Enter
 		Filter: domainTemplateCfg["Name"].(string)})
 	handleError(err, "domainTemplate", "READ")
 
-	log.Infof("################" + domainTemplateCfg["Name"].(string) + "###############")
-	log.Infof(domainTemplates)
+	log.Debugf("################" + domainTemplateCfg["Name"].(string) + "###############")
+	log.Debugf("Domain Templates %v", domainTemplates)
 
 	// init the enterprise struct that will hold either the received object
 	// or will be created from the domainTemplateCfg

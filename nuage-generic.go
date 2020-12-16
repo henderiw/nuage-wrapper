@@ -37,13 +37,13 @@ func User(userCfg map[string]interface{}, parent *vspk.Me) *vspk.User {
 		Filter: userCfg["UserName"].(string)})
 	handleError(err, "User", "READ")
 
-	log.Infof("################" + userCfg["UserName"].(string) + "###############")
-	log.Infof(users)
+	log.Debugf("################" + userCfg["UserName"].(string) + "###############")
+	log.Debugf("Users %v", users)
 
 	// init the user struct that will hold either the received object
 	// or will be created from the userCfg
 	if users != nil {
-		log.Infof"User already exists")
+		log.Infof("User already exists")
 
 		user = users[0]
 		errMergo := mergo.Map(user, userCfg, mergo.WithOverride)

@@ -1,6 +1,7 @@
 package nuagewrapper
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/imdario/mergo"
@@ -362,7 +363,7 @@ func CreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk.Me) 
 			}
 
 			uplinkConn := UplinkConnection(uplinkConnCfg, nsVlan)
-			//log.Infof(uplinkConn)
+			log.Debugf("Uplink Conn %v", uplinkConn)
 		}
 
 	}
@@ -383,7 +384,7 @@ func CreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk.Me) 
 			}
 			log.Infof("Access VLANCfg: %#v \n", nsVlanCfg)
 			nsVlan := Vlan(nsVlanCfg, nsPort)
-			//log.Infof(nsVlan)
+			log.Debugf("VLAN %v", nsVlan)
 		}
 
 	}
@@ -405,7 +406,7 @@ func CreateEntireNSG(nsgCfg NuageNSGCfg, parent *vspk.Enterprise, Usr *vspk.Me) 
 			"BroadcastSSID":      true,
 		}
 		ssidConn := SSIDConnection(ssidConnCfg, nsPort)
-		//log.Infof(ssidConn)
+		log.Debugf("SSID COnn %v", ssidConn)
 	}
 
 	log.Infof("%#v \n", nsGateway)
@@ -535,9 +536,8 @@ func GetNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.
 	if nsGateways == nil {
 		log.Infof("NS Gateway does not exists")
 
-		
 		return nil
-	} 
+	}
 	nsGateway = nsGateways[0]
 	return nsGateway
 }
@@ -559,7 +559,7 @@ func DeleteNSG(nsGatewayCfg map[string]interface{}, parent *vspk.Enterprise) err
 
 		nsGateway = nsGateways[0]
 		nsGateway.Delete()
-	} 
+	}
 	log.Infof("DeleteNSG finished")
 	return nil
 }
@@ -666,7 +666,7 @@ func NSGRedundantPort(nsRedundantPortCfg map[string]interface{}, parent *vspk.NS
 		if errMergo != nil {
 			log.Fatal(errMergo)
 		}
-		log.Infof(nsRedundantPortCfg)
+		log.Debugf("Redundant Port cfg %v", nsRedundantPortCfg)
 		err := parent.CreateRedundantPort(nsRedundantPort)
 		handleError(err, "CREATE", "NS Redundant Port ")
 
@@ -731,7 +731,7 @@ func DeleteNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) err
 
 		nsPort = nsPorts[0]
 		nsPort.Delete()
-	} 
+	}
 
 	log.Infof("DeleteNSGPort finished")
 	return nil
@@ -751,7 +751,7 @@ func GetNSGPort(nsPortCfg map[string]interface{}, parent *vspk.NSGateway) *vspk.
 	if nsPorts == nil {
 		log.Infof("NS Port does not exists")
 		return nil
-	} 
+	}
 
 	nsPort = nsPorts[0]
 	return nsPort
@@ -853,7 +853,7 @@ func Vlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN {
 	log.Infof("VLANs %#v \n", nsVlans)
 
 	if nsVlans != nil {
-		flog.Infof("NS VLAN already exists")
+		log.Infof("NS VLAN already exists")
 
 		nsVlan = nsVlans[0]
 		errMergo := mergo.Map(nsVlan, nsVlanCfg, mergo.WithOverride)
@@ -901,7 +901,7 @@ func DeleteVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) error {
 
 		nsVlan = nsVlans[0]
 		nsVlan.Delete()
-	} 
+	}
 	log.Infof("DeleteVlan finished")
 	return nil
 }
@@ -922,9 +922,9 @@ func GetVlan(nsVlanCfg map[string]interface{}, parent *vspk.NSPort) *vspk.VLAN {
 	if nsVlans == nil {
 		log.Infof("NS VLAN already exists")
 		return nil
-	} 
+	}
 
-	vlan = nsVlans[0]
+	nsVlan = nsVlans[0]
 	return nsVlan
 }
 

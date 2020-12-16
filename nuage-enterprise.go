@@ -17,7 +17,7 @@ func Enterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vspk.Ent
 	handleError(err, "Enterprise", "READ")
 
 	log.Debugf("################" + enterpriseCfg["Name"].(string) + "###############")
-	log.Debugf(enterprises)
+	log.Debugf("ENterprises: %v",enterprises)
 
 	// init the enterprise struct that will hold either the received object
 	// or will be created from the enterpriseCfg
@@ -67,7 +67,7 @@ func DeleteEnterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vs
 	return enterprise
 }
 
-// GetNuageEnterprise is a wrapper to get nuage enterprise
+// GetEnterprise is a wrapper to get nuage enterprise
 func GetEnterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vspk.Enterprise {
 	enterprise := &vspk.Enterprise{}
 
@@ -91,8 +91,8 @@ func Enterpriseprofile(enterpriseProfileCfg map[string]interface{}, parent *vspk
 		Filter: enterpriseProfileCfg["Name"].(string)})
 	handleError(err, "enterpriseProfile", "READ")
 
-	log.Infof("################" + enterpriseProfileCfg["Name"].(string) + "###############")
-	log.Infof(enterpriseProfiles)
+	log.Debugf("################" + enterpriseProfileCfg["Name"].(string) + "###############")
+	log.Debugf("Enterprise Profile %v", enterpriseProfiles)
 
 	// init the enterprise struct that will hold either the received object
 	// or will be created from the enterpriseProfileCfg
