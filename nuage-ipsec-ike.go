@@ -47,7 +47,7 @@ func CreateIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vs
 }
 
 // DeleteIKEPSK is a wrapper to delete a IKE PSK in a declaritive way
-func DeleteIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vspk.IKEPSK {
+func DeleteIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) error {
 	log.Infof("DeleteIKEPSK started")
 
 	ikePSK := &vspk.IKEPSK{}
@@ -66,7 +66,7 @@ func DeleteIKEPSK(ikePSKCfg map[string]interface{}, parent *vspk.Enterprise) *vs
 
 	}
 	log.Infof("DeleteIKEPSK finished")
-	return ikePSK
+	return nil
 }
 
 // CreateIKEGateway is a wrapper to create a IKE GW in a declaritive way
