@@ -9,8 +9,6 @@ github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 h1:iQTw/8FWTuc7uia
 github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0/go.mod h1:1NbS8ALrpOvjt0rHPNLyCIeMtbizbir8U//inJ+zuB8=
 github.com/nuagenetworks/go-bambou v1.0.1 h1:2a57V5x9SgRJBiks3ctaKmunzeCnzSGk70wWVVjgP8M=
 github.com/nuagenetworks/go-bambou v1.0.1/go.mod h1:yC0ArV/eEns5nHC0UPwLOcKWkbCZxb63tUd352gL7M4=
-github.com/nuagenetworks/vspk-go v6.0.9+incompatible h1:VFF2psz04wOgtQgotbfyPNZ6ale5TE9URkOUBeR3BTA=
-github.com/nuagenetworks/vspk-go v6.0.9+incompatible/go.mod h1:fmVBvdkGnXfHSn7drdJwlPqNa+123RmOMpzSubPT6E8=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.7.0 h1:ShrD1U9pZB12TX0cVy0DtePoCH97K8EtX+mg7ZARUtM=
 github.com/sirupsen/logrus v1.7.0/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=

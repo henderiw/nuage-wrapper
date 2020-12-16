@@ -3,7 +3,7 @@ package nuagewrapper
 import (
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
-	"github.com/nuagenetworks/vspk-go/vspk"
+	"github.com/henderiw/nuage-wrapper/pkg/vspk"
 	log "github.com/sirupsen/logrus"
 )
 

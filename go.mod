@@ -8,6 +8,5 @@ require (
 	github.com/imdario/mergo v0.3.11
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/nuagenetworks/go-bambou v1.0.1
-	github.com/nuagenetworks/vspk-go v6.0.9
 	github.com/sirupsen/logrus v1.7.0
 )

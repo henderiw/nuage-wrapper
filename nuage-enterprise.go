@@ -1,9 +1,9 @@
 package nuagewrapper
 
 import (
+	"github.com/henderiw/nuage-wrapper/pkg/vspk"
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
-	"github.com/nuagenetworks/vspk-go/vspk"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,7 +17,7 @@ func Enterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vspk.Ent
 	handleError(err, "Enterprise", "READ")
 
 	log.Debugf("################" + enterpriseCfg["Name"].(string) + "###############")
-	log.Debugf("ENterprises: %v",enterprises)
+	log.Debugf("ENterprises: %v", enterprises)
 
 	// init the enterprise struct that will hold either the received object
 	// or will be created from the enterpriseCfg
@@ -62,7 +62,7 @@ func DeleteEnterprise(enterpriseCfg map[string]interface{}, parent *vspk.Me) *vs
 		enterprise = enterprises[0]
 		enterprise.Delete()
 
-	} 
+	}
 	log.Infof("DeleteEnterprise finished")
 	return enterprise
 }

@@ -4,9 +4,9 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/henderiw/nuage-wrapper/pkg/vspk"
 	"github.com/imdario/mergo"
 	"github.com/nuagenetworks/go-bambou/bambou"
-	"github.com/nuagenetworks/vspk-go/vspk"
 	log "github.com/sirupsen/logrus"
 )
 
