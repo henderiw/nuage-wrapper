@@ -9,4 +9,5 @@ require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/nuagenetworks/go-bambou v1.0.1
 	github.com/sirupsen/logrus v1.7.0
+	github.com/smartystreets/goconvey v1.6.4 // indirect
 )
