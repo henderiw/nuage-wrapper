@@ -125,7 +125,7 @@ type SystemConfig struct {
 	SecondaryRTLowerLimit                             int           `json:"secondaryRTLowerLimit,omitempty"`
 	SecondaryRTUpperLimit                             int           `json:"secondaryRTUpperLimit,omitempty"`
 	PerDomainVlanIdEnabled                            bool          `json:"perDomainVlanIdEnabled"`
-	ServiceIDUpperLimit                               int           `json:"serviceIDUpperLimit,omitempty"`
+	ServiceIDUpperLimit                               int64         `json:"serviceIDUpperLimit,omitempty"`
 	KeyServerMonitorEnabled                           bool          `json:"keyServerMonitorEnabled"`
 	KeyServerVSDDataSynchronizationInterval           int           `json:"keyServerVSDDataSynchronizationInterval,omitempty"`
 	OffsetCustomerID                                  int           `json:"offsetCustomerID,omitempty"`
